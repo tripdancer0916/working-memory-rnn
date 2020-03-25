@@ -65,7 +65,7 @@ def main(config_path):
         model.train()
         for i, data in enumerate(train_dataloader):
             inputs, target = data
-            inputs, target = inputs.float(), target.float()
+            inputs, target = inputs.float(), target.long()
             inputs, target = Variable(inputs).to(device), Variable(target).to(device)
 
             hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], cfg['MODEL']['SIZE'])

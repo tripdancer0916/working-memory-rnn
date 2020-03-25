@@ -36,4 +36,7 @@ class RomoDataset(data.Dataset):
         else:
             target = np.array([0, 1])
 
+        signal = np.expand_dims(signal, axis=1)
+        target = np.expand_dims(target, axis=1)
+
         return signal, target

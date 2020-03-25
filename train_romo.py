@@ -74,15 +74,15 @@ def main(config_path):
             optimizer.zero_grad()
             hidden = hidden.detach()
             hidden_list, output, hidden = model(inputs, hidden)
+            print(output)
 
             loss = torch.nn.CrossEntropyLoss()(output[:, -1], target)
             loss.backward()
             optimizer.step()
 
-        if epoch > 0 and epoch % 10 == 0:
-            print(f'Train Epoch: {epoch}, Loss: {loss.item():.6f}')
-            print('output', output[0, :, 0].cpu().detach().numpy())
-            print('target', target[0, :, 0].cpu().detach().numpy())
+        print(f'Train Epoch: {epoch}, Loss: {loss.item():.6f}')
+        print('output', output[0, :, 0].cpu().detach().numpy())
+        print('target', target[0, :, 0].cpu().detach().numpy())
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
             torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
 

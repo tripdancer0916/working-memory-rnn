@@ -83,7 +83,7 @@ def main(config_path):
         print(f'Train Epoch: {epoch}, Loss: {loss.item():.6f}')
         print('output', output[0, -1, :].cpu().detach().numpy())
         print('target', target[0].cpu().detach().numpy())
-        acc = (np.argmax(output[:, -1], axis=1) == target).sum().item() / 50
+        acc = (np.argmax(output[:, -1].cpu().detach().numpy(), axis=1) == target.cpu().detach().numpy()).sum().item() / 50
         print('acc: ', acc)
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
             torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))

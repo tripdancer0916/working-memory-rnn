@@ -44,6 +44,7 @@ class RecurrentNeuralNetwork(nn.Module):
 
         different_j = torch.zeros((num_batch, self.n_hid, self.n_hid)).to(self.device)
         additional_w = torch.zeros((num_batch, self.n_hid, self.n_hid)).to(self.device)
+        new_j = self.w_hh.weight
         for t in range(length):
             activated = torch.tanh(hidden)
 
@@ -54,7 +55,7 @@ class RecurrentNeuralNetwork(nn.Module):
             hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
 
             additional_w = self.make_synaptic_plasticity(activated, additional_w, self.beta)
-            new_j = (1 - self.beta) * self.w_hh.weight + self.beta * additional_w
+            new_j = (1 - self.beta) * new_j + self.beta * additional_w
             different_j = new_j - self.w_hh.weight
 
             output = self.w_out(hidden)

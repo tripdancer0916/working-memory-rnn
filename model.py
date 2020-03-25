@@ -53,7 +53,7 @@ class RecurrentNeuralNetwork(nn.Module):
             neural_noise = self.make_neural_noise(hidden, self.alpha)
             hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
 
-            additional_w = self.make_synaptic_plasticity(activated, additional_w, self.alpha)
+            additional_w = self.make_synaptic_plasticity(activated, additional_w, self.beta)
             new_j = (1 - self.beta) * self.w_hh.weight + self.beta * additional_w
             different_j = new_j - self.w_hh.weight
 

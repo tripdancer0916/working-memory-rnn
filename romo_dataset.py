@@ -32,9 +32,9 @@ class RomoDataset(data.Dataset):
 
         # target
         if first_signal_freq > second_signal_freq:
-            target = np.array([1, 0])
+            target = np.array([0])
         else:
-            target = np.array([0, 1])
+            target = np.array([1])
 
         signal = np.expand_dims(signal, axis=1)
         target = np.expand_dims(target, axis=1)

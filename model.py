@@ -29,7 +29,7 @@ class RecurrentNeuralNetwork(nn.Module):
         return torch.randn_like(hidden).to(self.device) * self.sigma_neu * torch.sqrt(alpha)
 
     def make_synaptic_plasticity(self, firing_rate, synapse, beta):
-        outer_product = torch.zeros([50, self.n_hid, self.n_hid])
+        outer_product = torch.zeros([50, self.n_hid, self.n_hid]).to(self.device)
         for i in range(50):
             outer_product[i, :, :] = torch.ger(firing_rate[i], firing_rate[i])
         return outer_product + torch.randn_like(synapse).to(self.device) * self.sigma_syn * torch.sqrt(beta)

@@ -51,7 +51,7 @@ class RecurrentNeuralNetwork(nn.Module):
             activated = torch.tanh(hidden)
 
             different_j_activity = torch.matmul(activated.unsqueeze(1), different_j).squeeze(1)
-            print(torch.norm(different_j_activity).item())
+            # print(torch.norm(different_j_activity).item())
             tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated) + different_j_activity
 
             neural_noise = self.make_neural_noise(hidden, self.alpha)

@@ -61,10 +61,9 @@ def main(config_path):
 
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),
                            lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
-
+    correct = 0
+    num_data = 0
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
-        correct = 0
-        num_data = 0
         model.train()
         for i, data in enumerate(train_dataloader):
             inputs, target = data
@@ -83,17 +82,20 @@ def main(config_path):
             loss.backward()
             optimizer.step()
 
-        print(f'Train Epoch: {epoch}, Loss: {loss.item():.6f}')
-        print('output', output[0, -1, :].cpu().detach().numpy())
-        print('target', target[0].cpu().detach().numpy())
-        print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
-        print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
-        correct += (np.argmax(output[:, -1].cpu().detach().numpy(), axis=1) == target.cpu().detach().numpy()).sum().item()
-        num_data += target.cpu().detach().numpy().shape[0]
-        acc = correct / num_data
-        print('acc: ', acc)
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
+            print(f'Train Epoch: {epoch}, Loss: {loss.item():.6f}')
+            print('output', output[0, -1, :].cpu().detach().numpy())
+            print('target', target[0].cpu().detach().numpy())
+            print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
+            print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
+            correct += (np.argmax(output[:, -1].cpu().detach().numpy(),
+                                  axis=1) == target.cpu().detach().numpy()).sum().item()
+            num_data += target.cpu().detach().numpy().shape[0]
+            acc = correct / num_data
+            print('acc: ', acc)
             torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
+            correct = 0
+            num_data = 0
 
 
 if __name__ == '__main__':

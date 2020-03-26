@@ -40,7 +40,7 @@ def main(config_path):
     print(device)
 
     model = RecurrentNeuralNetwork(n_in=1, n_out=2, n_hid=cfg['MODEL']['SIZE'], device=device,
-                                   alpha_time_scale=0.25, beta_time_scale=0.01,
+                                   alpha_time_scale=0.25, beta_time_scale=0.05,
                                    activation=cfg['MODEL']['ACTIVATION'],
                                    sigma_neu=cfg['MODEL']['SIGMA_NEU'],
                                    sigma_syn=cfg['MODEL']['SIGMA_SYN'],

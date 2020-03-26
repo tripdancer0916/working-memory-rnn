@@ -44,7 +44,8 @@ def main(config_path):
                                    activation=cfg['MODEL']['ACTIVATION'],
                                    sigma_neu=cfg['MODEL']['SIGMA_NEU'],
                                    sigma_syn=cfg['MODEL']['SIGMA_SYN'],
-                                   use_bias=cfg['MODEL']['USE_BIAS']).to(device)
+                                   use_bias=cfg['MODEL']['USE_BIAS'],
+                                   anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
     train_dataset = RomoDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                 freq_min=cfg['DATALOADER']['FREQ_MIN'],

@@ -68,4 +68,4 @@ class RecurrentNeuralNetwork(nn.Module):
         hidden_list = hidden_list.permute(1, 0, 2)
         output_list = output_list.permute(1, 0, 2)
 
-        return hidden_list, output_list, hidden
+        return hidden_list, output_list, hidden, new_j

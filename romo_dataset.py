@@ -18,8 +18,8 @@ class RomoDataset(data.Dataset):
     def __getitem__(self, item):
         # input signal
         signal = np.zeros(self.time_length + 1)
-        first_signal_timing = np.random.randint(self.time_length - self.signal_length - 10)
-        second_signal_timing = np.random.randint(first_signal_timing + 5, self.time_length - self.signal_length)
+        first_signal_timing = 10
+        second_signal_timing = 50
 
         first_signal_freq = np.random.rand() * (self.freq_max - self.freq_min) + self.freq_min
         while True:

@@ -59,6 +59,7 @@ def main(config_path):
                                                    worker_init_fn=lambda x: np.random.seed())
 
     print(model)
+    print('Epoch Loss Acc')
 
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),
                            lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
@@ -86,17 +87,13 @@ def main(config_path):
                                   axis=1) == target.cpu().detach().numpy()).sum().item()
             num_data += target.cpu().detach().numpy().shape[0]
 
-        if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
-            print(f'Train Epoch: {epoch}, Loss: {loss.item():.6f}')
-            print('output', output[0, -1, :].cpu().detach().numpy())
-            print('target', target[0].cpu().detach().numpy())
-            # print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
-            # print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
+        if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data
-            print('acc: ', acc)
-            torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
+            print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
             correct = 0
             num_data = 0
+        if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
+            torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
 
 
 if __name__ == '__main__':

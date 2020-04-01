@@ -90,8 +90,8 @@ def main(config_path):
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
-            print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
-            print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
+            # print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
+            # print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
             correct = 0
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:

@@ -29,9 +29,11 @@ class RomoDataset(data.Dataset):
         first_signal_timing = 0
         second_signal_timing = self.time_length - self.signal_length
 
-        first_signal_freq = np.random.rand() * (self.freq_max - self.freq_min) + self.freq_min
+        first_signal_freq = np.random.rand() * (self.freq_max - self.freq_min) + \
+            self.freq_min
         while True:
-            second_signal_freq = np.random.rand() * (self.freq_max - self.freq_min) + self.freq_min
+            second_signal_freq = np.random.rand() * (self.freq_max - self.freq_min) + \
+                self.freq_min
             if abs(second_signal_freq - first_signal_freq) > self.min_interval:
                 break
         t = np.arange(0, self.signal_length / 4, 0.25)

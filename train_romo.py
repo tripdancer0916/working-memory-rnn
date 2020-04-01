@@ -51,7 +51,8 @@ def main(config_path):
                                 freq_min=cfg['DATALOADER']['FREQ_MIN'],
                                 freq_max=cfg['DATALOADER']['FREQ_MAX'],
                                 min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
-                                signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'])
+                                signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                sigma_in=cfg['DATALOADER']['SIGMA_IN'])
 
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
                                                    num_workers=2, shuffle=True,

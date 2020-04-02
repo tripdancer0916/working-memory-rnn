@@ -46,7 +46,7 @@ def main(config_path):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'../trained_model/romo/{model_name}/epoch_500.pth'
+    model_path = f'trained_model/romo/{model_name}/epoch_500.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.eval()

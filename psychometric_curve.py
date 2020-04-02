@@ -38,6 +38,7 @@ def main(config_path):
     # モデルのロード
     torch.manual_seed(1)
     device = torch.device('cpu')
+    cfg['MODEL']['SIGMA_NEU'] = 0
     model = RecurrentNeuralNetwork(n_in=1, n_out=2, n_hid=cfg['MODEL']['SIZE'], device=device,
                                    alpha_time_scale=0.25, beta_time_scale=cfg['MODEL']['BETA'],
                                    activation=cfg['MODEL']['ACTIVATION'],

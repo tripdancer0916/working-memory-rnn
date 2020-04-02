@@ -58,7 +58,7 @@ def main(config_path):
 
     # model 1
     deltas = np.arange(-2, 2, 0.05)
-    N = 1000
+    N = 200
     signal_length = 25
     sigma_in = 0.05
     score = np.zeros(deltas.shape[0])
@@ -67,8 +67,8 @@ def main(config_path):
     for delta in deltas:
         output_list = np.zeros(N)
         input_signal = romo_signal(delta, N, signal_length, sigma_in)
-        input_signal_split = np.split(input_signal, 20)
-        for i in range(20):
+        input_signal_split = np.split(input_signal, 4)
+        for i in range(4):
             hidden = torch.zeros(50, model.n_hid)
             hidden = hidden.to(device)
             inputs = torch.from_numpy(input_signal_split[i]).float()

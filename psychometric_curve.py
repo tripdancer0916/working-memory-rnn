@@ -28,7 +28,7 @@ def romo_signal(delta, N, signal_length, sigma_in):
     return signals
 
 
-def main(config_path, sigma_in):
+def main(config_path, sigma_in, signal_length):
     # hyper-parameter
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
@@ -59,7 +59,7 @@ def main(config_path, sigma_in):
     # model 1
     deltas = np.arange(-2, 2, 0.05)
     N = 200
-    signal_length = 25
+    # signal_length = 25
     # sigma_in = 0.05
     score = np.zeros(deltas.shape[0])
     delta_index = 0
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch RNN training')
     parser.add_argument('config_path', type=str)
     parser.add_argument('--sigma_in', type=float, default=0.05)
+    parser.add_argument('--signal_length', type=int, default=25)
     args = parser.parse_args()
     print(args)
-    main(args.config_path, args.sigma_in)
+    main(args.config_path, args.sigma_in, args.signal_length)

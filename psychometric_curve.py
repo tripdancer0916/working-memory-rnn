@@ -10,11 +10,11 @@ from model import RecurrentNeuralNetwork
 
 def romo_signal(delta, N, signal_length, sigma_in):
     signals = np.zeros([N, 61, 1])
-    freq_range = min(5, 5 - delta) - max(1, 1 + delta)
+    freq_range = 4 - abs(delta)
     for i in range(N):
         first_signal_timing = 0
         second_signal_timing = 60 - signal_length
-        first_signal_freq = np.random.rand() * freq_range + max(1, 1 + delta)
+        first_signal_freq = np.random.rand() * freq_range + max(1, 1 - delta)
         second_signal_freq = first_signal_freq + delta
         t = np.arange(0, signal_length / 4, 0.25)
         phase_shift_1 = np.random.rand() * np.pi

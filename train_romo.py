@@ -69,7 +69,7 @@ def main(config_path):
         model.train()
         for i, data in enumerate(train_dataloader):
             inputs, target = data
-            print(inputs.shape)
+            # print(inputs.shape)
             inputs, target = inputs.float(), target.long()
             inputs, target = Variable(inputs).to(device), Variable(target).to(device)
 

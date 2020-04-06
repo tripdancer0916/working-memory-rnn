@@ -59,7 +59,7 @@ def main(config_path, sigma_in, signal_length, trial_num):
     save_path = f'results/freq_correlation/'
     os.makedirs(save_path, exist_ok=True)
 
-    neural_dynamics = np.zeros((trial_num, model.n_hid, 61))
+    neural_dynamics = np.zeros((trial_num, 61, model.n_hid))
     input_signal, omega_1_list, omega_2_list = romo_signal(trial_num, signal_length, sigma_in)
     input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
@@ -81,7 +81,7 @@ def main(config_path, sigma_in, signal_length, trial_num):
     # omega_1
     for time in range(10, 60):
         for neuron_idx in range(model.n_hid):
-            spearman_r, _ = spearmanr(neural_dynamics[:, neuron_idx, time], omega_1_list)
+            spearman_r, _ = spearmanr(neural_dynamics[:, time, neuron_idx], omega_1_list)
             omega_1_correlation[time - 10, neuron_idx] = spearman_r
             if time == 14:
                 print(time, neuron_idx, spearman_r)
@@ -90,7 +90,7 @@ def main(config_path, sigma_in, signal_length, trial_num):
     # omega_2
     for time in range(45, 60):
         for neuron_idx in range(model.n_hid):
-            spearman_r, _ = spearmanr(neural_dynamics[:, neuron_idx, time], omega_2_list)
+            spearman_r, _ = spearmanr(neural_dynamics[:, time, neuron_idx], omega_2_list)
             omega_2_correlation[time - 45, neuron_idx] = spearman_r
 
     np.save(os.path.join(save_path, f'{model_name}_{sigma_in}_{trial_num}_omega_1.npy'), omega_1_correlation)

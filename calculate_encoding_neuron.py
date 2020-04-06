@@ -83,6 +83,10 @@ def main(config_path, sigma_in, signal_length, trial_num):
         for neuron_idx in range(model.n_hid):
             spearman_r, _ = spearmanr(neural_dynamics[:, neuron_idx, time], omega_1_list)
             omega_1_correlation[time - 10, neuron_idx] = spearman_r
+            if time == 14:
+                print(time, neuron_idx, spearman_r)
+            if time == 44:
+                print(time, neuron_idx, spearman_r)
     # omega_2
     for time in range(45, 60):
         for neuron_idx in range(model.n_hid):

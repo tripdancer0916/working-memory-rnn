@@ -61,10 +61,10 @@ def main(config_path, sigma_in, signal_length, trial_num):
 
     neural_dynamics = np.zeros((trial_num, model.n_hid, 61))
     input_signal, omega_1_list, omega_2_list = romo_signal(trial_num, signal_length, sigma_in)
-    input_signal_split = np.split(input_signal, trial_num / cfg['TRAIN']['BATCHSIZE'])
+    input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
     # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。
-    for i in range(trial_num / cfg['TRAIN']['BATCHSIZE']):
+    for i in range(trial_num // cfg['TRAIN']['BATCHSIZE']):
         hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
         hidden = hidden.to(device)
         inputs = torch.from_numpy(input_signal_split[i]).float()

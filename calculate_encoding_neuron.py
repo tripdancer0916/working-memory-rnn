@@ -17,6 +17,8 @@ def romo_signal(batch_size, signal_length, sigma_in):
     for i in range(batch_size):
         omega_1 = np.random.rand() * 4 + 1
         omega_2 = np.random.rand() * 4 + 1
+        omega_1_list[i] = omega_1
+        omega_2_list[i] = omega_2
         first_signal_timing = 0
         second_signal_timing = 60 - signal_length
         t = np.arange(0, signal_length / 4, 0.25)

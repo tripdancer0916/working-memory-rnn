@@ -76,9 +76,9 @@ def main(config_path, sigma_in, signal_length, trial_num):
         neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
     # 各neuron index, 時間ごとにcorrelation(Spearmanの順位相関係数）を計算する。
-    # 期間はomega_1はt=10~60の50単位時間にかけて、omega_2はt=45~60かなあ
+    # 期間はt=10~60の50単位時間にかけて
     omega_1_correlation = np.zeros((50, model.n_hid))
-    omega_2_correlation = np.zeros((15, model.n_hid))
+    omega_2_correlation = np.zeros((50, model.n_hid))
 
     # omega_1
     for time in range(10, 60):
@@ -90,10 +90,10 @@ def main(config_path, sigma_in, signal_length, trial_num):
             if time == 44:
                 print(time, neuron_idx, spearman_r)
     # omega_2
-    for time in range(45, 60):
+    for time in range(10, 60):
         for neuron_idx in range(model.n_hid):
             spearman_r, _ = spearmanr(neural_dynamics[:, time, neuron_idx], omega_2_list)
-            omega_2_correlation[time - 45, neuron_idx] = spearman_r
+            omega_2_correlation[time - 10, neuron_idx] = spearman_r
 
     np.save(os.path.join(save_path, f'{model_name}_{sigma_in}_{trial_num}_omega_1.npy'), omega_1_correlation)
     np.save(os.path.join(save_path, f'{model_name}_{sigma_in}_{trial_num}_omega_2.npy'), omega_2_correlation)
@@ -102,9 +102,9 @@ def main(config_path, sigma_in, signal_length, trial_num):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch RNN training')
     parser.add_argument('config_path', type=str)
-    parser.add_argument('--sigma_in', type=float, default=0.05)
-    parser.add_argument('--signal_length', type=int, default=25)
-    parser.add_argument('--trial_num', type=int, default=100)
+    parser.add_argument('--sigma_in', type=float, default=0)
+    parser.add_argument('--signal_length', type=int, default=15)
+    parser.add_argument('--trial_num', type=int, default=3000)
     args = parser.parse_args()
     print(args)
     main(args.config_path, args.sigma_in, args.signal_length, args.trial_num)

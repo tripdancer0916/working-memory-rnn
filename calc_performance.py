@@ -87,6 +87,8 @@ def main(config_path, sigma_in, signal_length):
             else:
                 ans = 0
             correct += (output_list == ans).sum()
+            if delta_idx % 10 == 0:
+                print(delta_idx, delta, (output_list == ans).sum() / 200)
             # print(f'{delta:.3f}', (output_list == ans).sum() / 200)
 
         results_acc[acc_idx] = correct / num_data

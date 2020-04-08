@@ -72,7 +72,7 @@ def main(config_path, sigma_in, signal_length):
         hidden_list, outputs, _, _ = model(inputs, hidden)
         hidden_list_np = hidden_list.cpu().detach().numpy()
         outputs_np[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = np.argmax(
-            outputs.detach().numpy()[:, -1], axis=1)
+            outputs.cpu().detach().numpy()[:, -1], axis=1)
         neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
     moving_distance = np.zeros(100)

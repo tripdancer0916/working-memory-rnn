@@ -65,6 +65,7 @@ def main(config_path, sigma_in, signal_length):
 
     # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。
     for i in range(trial_num // cfg['TRAIN']['BATCHSIZE']):
+        print(i)
         hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
         hidden = hidden.to(device)
         inputs = torch.from_numpy(input_signal_split[i]).float()

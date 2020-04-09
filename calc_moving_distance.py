@@ -60,7 +60,7 @@ def main(config_path, sigma_in, signal_length):
     trial_num = 100
     neural_dynamics = np.zeros((trial_num, 61, model.n_hid))
     outputs_np = np.zeros(trial_num)
-    input_signal = romo_signal_fix_omega_2(trial_num, 3, signal_length=15, sigma_in=0)
+    input_signal = romo_signal_fix_omega_2(trial_num, 3, signal_length=signal_length, sigma_in=sigma_in)
     input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
     # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。

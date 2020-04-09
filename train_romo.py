@@ -14,7 +14,7 @@ sys.path.append('../')
 
 from torch.autograd import Variable
 
-from romo_dataset import RomoDataset
+from romo_dataset import RomoDataset, RomoDatasetVariableDelay
 from model import RecurrentNeuralNetwork
 
 
@@ -47,12 +47,21 @@ def main(config_path):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    train_dataset = RomoDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
-                                freq_min=cfg['DATALOADER']['FREQ_MIN'],
-                                freq_max=cfg['DATALOADER']['FREQ_MAX'],
-                                min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
-                                signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
-                                sigma_in=cfg['DATALOADER']['SIGMA_IN'])
+    if 'var' in model_name:
+        train_dataset = RomoDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                                 freq_min=cfg['DATALOADER']['FREQ_MIN'],
+                                                 freq_max=cfg['DATALOADER']['FREQ_MAX'],
+                                                 min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                                 signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                                 sigma_in=cfg['DATALOADER']['SIGMA_IN'],
+                                                 delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
+    else:
+        train_dataset = RomoDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                    freq_min=cfg['DATALOADER']['FREQ_MIN'],
+                                    freq_max=cfg['DATALOADER']['FREQ_MAX'],
+                                    min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                    signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                    sigma_in=cfg['DATALOADER']['SIGMA_IN'])
 
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
                                                    num_workers=2, shuffle=True,

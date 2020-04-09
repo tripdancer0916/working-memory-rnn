@@ -1,9 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="kohei">
     <words>
+      <w>batchsize</w>
       <w>cuda</w>
+      <w>dataloader</w>
       <w>dataset</w>
+      <w>hebb</w>
       <w>hebbian</w>
+      <w>optim</w>
       <w>romo</w>
       <w>spearman</w>
     </words>

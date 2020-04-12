@@ -52,14 +52,13 @@ def main(config_path, sigma_in, signal_length):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'trained_model/romo/{model_name}/epoch_500.pth'
+    model_path = f'trained_model/romo/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.eval()
 
     trial_num = 100
     neural_dynamics = np.zeros((trial_num, 61, model.n_hid))
-    outputs_np = np.zeros(trial_num)
     input_signal = romo_signal_fix_omega_2(trial_num, 3, signal_length=signal_length, sigma_in=sigma_in)
     input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
@@ -71,8 +70,6 @@ def main(config_path, sigma_in, signal_length):
         inputs = inputs.to(device)
         hidden_list, outputs, _, _ = model(inputs, hidden)
         hidden_list_np = hidden_list.cpu().detach().numpy()
-        outputs_np[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = np.argmax(
-            outputs.cpu().detach().numpy()[:, -1], axis=1)
         neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
     moving_distance = np.zeros(100)
@@ -82,6 +79,12 @@ def main(config_path, sigma_in, signal_length):
     print(np.mean(moving_distance), np.std(moving_distance))
 
     np.save(os.path.join(save_path, f'{model_name}.npy'), moving_distance)
+    norm_sum = np.linalg.norm(neural_dynamics[:, 15:45, :], axis=(1, 2))
+
+    os.makedirs('results/', exist_ok=True)
+    save_path = f'results/norm_sum/'
+    os.makedirs(save_path, exist_ok=True)
+    np.save(os.path.join(save_path, f'{model_name}.npy'), norm_sum)
 
 
 if __name__ == '__main__':

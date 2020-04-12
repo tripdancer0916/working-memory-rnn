@@ -59,7 +59,6 @@ def main(config_path, sigma_in, signal_length, alpha):
 
     sample_num = 5000
     neural_dynamics = np.zeros((sample_num, 61, model.n_hid))
-    outputs_np = np.zeros(sample_num)
     input_signal, omega_1_list, omega_2_list = romo_signal(sample_num, signal_length=signal_length,
                                                            sigma_in=sigma_in)
     input_signal_split = np.split(input_signal, sample_num // cfg['TRAIN']['BATCHSIZE'])
@@ -72,8 +71,6 @@ def main(config_path, sigma_in, signal_length, alpha):
         inputs = inputs.to(device)
         hidden_list, outputs, _, _ = model(inputs, hidden)
         hidden_list_np = hidden_list.cpu().detach().numpy()
-        outputs_np[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = np.argmax(
-            outputs.detach().numpy()[:, -1], axis=1)
         neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
     sample_X_1 = np.zeros([30 * sample_num, model.n_hid])

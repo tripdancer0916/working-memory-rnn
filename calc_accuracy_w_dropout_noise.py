@@ -65,7 +65,7 @@ def main(config_path, sigma_in, signal_length):
         dropout_ratio = 0.03 * acc_idx
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
-        mask = np.random.choice([0, 1], model.n_hid * model.n_hid, [dropout_ratio, 1-dropout_ratio])
+        mask = np.random.choice([0, 1], model.n_hid * model.n_hid, p=[dropout_ratio, 1-dropout_ratio])
         print(mask)
         mask = mask.reshape(model.n_hid, model.n_hid)
         torch_mask = torch.from_numpy(mask).float().to(device)

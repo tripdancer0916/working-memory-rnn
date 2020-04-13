@@ -64,7 +64,7 @@ def main(config_path, sigma_in, signal_length):
         correct = 0
         num_data = 0
         # print('delta correct_rate')
-        for delta_idx in range(50):
+        for delta_idx in range(20):
             while True:
                 delta = np.random.rand() * 8 - 4
                 if abs(delta) >= 1:

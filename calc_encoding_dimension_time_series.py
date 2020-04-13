@@ -61,7 +61,7 @@ def main(config_path, sigma_in, signal_length):
     model.eval()
 
     correct_ratio = np.zeros(11)
-    division_num = 31
+    division_num = 20
     time_sample = np.linspace(15, 45, division_num)
     omega_idx = 0
     for omega_1 in [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]:
@@ -87,7 +87,7 @@ def main(config_path, sigma_in, signal_length):
 
         for i in range(sample_num):
             time = np.random.choice(time_sample)
-            sample_X[i: (i + 1), :] = neural_dynamics[i, time, :]
+            sample_X[i: (i + 1), :] = neural_dynamics[i, int(time), :]
             sample_y[i] = time
 
         correct = 0

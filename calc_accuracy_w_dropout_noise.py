@@ -39,7 +39,7 @@ def main(config_path, sigma_in, signal_length):
     save_path = f'results/accuracy_w_dropout_noise/'
     os.makedirs(save_path, exist_ok=True)
 
-    print('sigma_syn accuracy')
+    print('dropout_ratio accuracy')
     # performanceは1つの学習済みモデルに対してsigma_neu^testを0から0.1まで変えてそれぞれの正解率を記録する。
     results_acc = np.zeros(11)
 
@@ -66,6 +66,7 @@ def main(config_path, sigma_in, signal_length):
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
         mask = np.random.choice([0, 1], model.n_hid * model.n_hid, [dropout_ratio, 1-dropout_ratio])
+        print(mask)
         mask = mask.reshape(model.n_hid, model.n_hid)
         torch_mask = torch.from_numpy(mask).float().to(device)
         new_w = torch.mul(original_w_hh, torch_mask)

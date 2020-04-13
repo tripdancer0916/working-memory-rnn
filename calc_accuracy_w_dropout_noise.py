@@ -62,7 +62,7 @@ def main(config_path, sigma_in, signal_length):
         model.eval()
 
         # add dropout noise
-        dropout_ratio = 0.03 * acc_idx
+        dropout_ratio = 0.05 * acc_idx
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
         mask = np.random.choice([0, 1], model.n_hid * model.n_hid, p=[dropout_ratio, 1-dropout_ratio])
@@ -102,7 +102,7 @@ def main(config_path, sigma_in, signal_length):
             # print(f'{delta:.3f}', (output_list == ans).sum() / 200)
 
         results_acc[acc_idx] = correct / num_data
-        print(cfg['MODEL']['SIGMA_NEU'], correct / num_data)
+        print(dropout_ratio, correct / num_data)
 
     np.save(os.path.join(save_path, f'{model_name}.npy'), results_acc)
 

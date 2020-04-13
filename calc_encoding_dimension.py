@@ -92,14 +92,14 @@ def main(config_path, sigma_in, signal_length):
         binary_def = np.random.choice([0, 1], 11)
         omega_1_sample = [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]
         binary_dict = {}
-        for i in range(11):
-            binary_dict[omega_1_sample[i]] = binary_def[i]
+        for j in range(11):
+            binary_dict[omega_1_sample[j]] = binary_def[j]
         label = np.zeros(sample_num)
-        for i in range(sample_num):
-            if binary_dict[sample_y[i]] == 1:
-                label[i] = 1
+        for j in range(sample_num):
+            if binary_dict[sample_y[j]] == 1:
+                label[j] = 1
             else:
-                label[i] = 0
+                label[j] = 0
 
         # 訓練データとテストデータを分離
         train_X, test_X, train_label, test_label = train_test_split(sample_X, label, random_state=0)

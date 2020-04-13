@@ -61,7 +61,8 @@ def main(config_path, sigma_in, signal_length):
     model.eval()
 
     correct_ratio = np.zeros(11)
-    time_sample = [15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45]
+    division_num = 20
+    time_sample = np.linspace(15, 45, division_num)
     omega_idx = 0
     for omega_1 in [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]:
         sample_num = 2000
@@ -91,9 +92,9 @@ def main(config_path, sigma_in, signal_length):
 
         correct = 0
         for i in range(300):
-            binary_def = np.random.choice([0, 1], 11)
+            binary_def = np.random.choice([0, 1], division_num)
             binary_dict = {}
-            for j in range(11):
+            for j in range(division_num):
                 binary_dict[time_sample[j]] = binary_def[j]
             label = np.zeros(sample_num)
             for j in range(sample_num):

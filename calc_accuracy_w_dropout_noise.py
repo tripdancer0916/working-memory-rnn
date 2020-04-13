@@ -36,7 +36,7 @@ def main(config_path, sigma_in, signal_length):
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
     os.makedirs('results/', exist_ok=True)
-    save_path = f'results/accuracy_w_synaptic_noise/'
+    save_path = f'results/accuracy_w_dropout_noise/'
     os.makedirs(save_path, exist_ok=True)
 
     print('sigma_syn accuracy')
@@ -61,12 +61,11 @@ def main(config_path, sigma_in, signal_length):
 
         model.eval()
 
-        # add synaptic noise
+        # add dropout noise
         sigma_syn = 0.001 * acc_idx
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
         synaptic_noise = torch.randn((cfg['MODEL']['SIZE'], cfg['MODEL']['SIZE'])) * sigma_syn
-        synaptic_noise = synaptic_noise.to(device)
         new_w = original_w_hh + synaptic_noise
         model.w_hh.weight = torch.nn.Parameter(new_w, requires_grad=False)
 

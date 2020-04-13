@@ -66,7 +66,6 @@ def main(config_path, sigma_in, signal_length):
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
         mask = np.random.choice([0, 1], model.n_hid * model.n_hid, p=[dropout_ratio, 1-dropout_ratio])
-        print(mask)
         mask = mask.reshape(model.n_hid, model.n_hid)
         torch_mask = torch.from_numpy(mask).float().to(device)
         new_w = torch.mul(original_w_hh, torch_mask)

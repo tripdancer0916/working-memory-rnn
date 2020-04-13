@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+nohup python -u calc_performance.py cfg/romo_config/1_var_4.cfg &
 nohup python -u calc_performance.py cfg/romo_config/1_var_6.cfg &
 
 wait

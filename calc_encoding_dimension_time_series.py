@@ -66,7 +66,6 @@ def main(config_path, sigma_in, signal_length):
     for omega_1 in [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]:
         sample_num = 2000
         neural_dynamics = np.zeros((sample_num, 61, model.n_hid))
-        outputs_np = np.zeros(sample_num)
         input_signal, omega_2_list = romo_signal_fixed_omega_1(omega_1, sample_num,
                                                                signal_length=signal_length,
                                                                sigma_in=sigma_in)
@@ -80,8 +79,6 @@ def main(config_path, sigma_in, signal_length):
             inputs = inputs.to(device)
             hidden_list, outputs, _, _ = model(inputs, hidden)
             hidden_list_np = hidden_list.cpu().detach().numpy()
-            outputs_np[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = np.argmax(
-                outputs.detach().numpy()[:, -1], axis=1)
             neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
         sample_X = np.zeros([sample_num, model.n_hid])

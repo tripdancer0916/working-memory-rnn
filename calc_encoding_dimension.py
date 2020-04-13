@@ -113,7 +113,7 @@ def main(config_path, sigma_in, signal_length):
         # テストデータに対する精度
         pred_test = linear_svc.predict(test_X)
         accuracy_test = accuracy_score(test_label, pred_test)
-        # print('テストデータに対する正解率： %.2f' % accuracy_test)
+        print('テストデータに対する正解率： %.2f' % accuracy_test)
         if accuracy_test > 0.85:
             correct += 1
 

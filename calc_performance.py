@@ -72,8 +72,8 @@ def main(config_path, sigma_in, signal_length):
             N = 100
             output_list = np.zeros(N)
             input_signal = romo_signal(delta, N, signal_length, sigma_in)
-            input_signal_split = np.split(input_signal, 4)
-            for i in range(4):
+            input_signal_split = np.split(input_signal, 2)
+            for i in range(2):
                 hidden = torch.zeros(50, model.n_hid)
                 hidden = hidden.to(device)
                 inputs = torch.from_numpy(input_signal_split[i]).float()

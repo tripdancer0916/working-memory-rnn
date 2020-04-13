@@ -62,11 +62,13 @@ def main(config_path, sigma_in, signal_length):
         model.eval()
 
         # add dropout noise
-        sigma_syn = 0.001 * acc_idx
+        dropout_ratio = 0.03 * acc_idx
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
-        synaptic_noise = torch.randn((cfg['MODEL']['SIZE'], cfg['MODEL']['SIZE'])) * sigma_syn
-        new_w = original_w_hh + synaptic_noise
+        mask = np.random.choice([0, 1], model.n_hid * model.n_hid, [dropout_ratio, 1-dropout_ratio])
+        mask = mask.reshape(model.n_hid, model.n_hid)
+        torch_mask = torch.from_numpy(mask).float().to(device)
+        new_w = torch.mul(original_w_hh, torch_mask)
         model.w_hh.weight = torch.nn.Parameter(new_w, requires_grad=False)
 
         correct = 0

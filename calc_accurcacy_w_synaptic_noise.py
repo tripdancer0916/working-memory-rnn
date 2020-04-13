@@ -62,7 +62,7 @@ def main(config_path, sigma_in, signal_length):
         model.eval()
 
         # add synaptic noise
-        sigma_syn = 0.001 * acc_idx
+        sigma_syn = 0.01 * acc_idx
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
         synaptic_noise = torch.randn((cfg['MODEL']['SIZE'], cfg['MODEL']['SIZE'])) * sigma_syn

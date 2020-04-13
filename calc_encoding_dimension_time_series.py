@@ -61,7 +61,7 @@ def main(config_path, sigma_in, signal_length):
     model.eval()
 
     correct_ratio = np.zeros(11)
-    division_num = 31
+    division_num = 20
     time_sample = np.linspace(15, 45, division_num)
     omega_idx = 0
     for omega_1 in [3, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]:
@@ -112,10 +112,14 @@ def main(config_path, sigma_in, signal_length):
             # モデルの学習。fit関数で行う。
             linear_svc.fit(train_X, train_label)
 
+            # train dataに対する精度
+            pred_train = linear_svc.predict(train_X)
+            accuracy_train = accuracy_score(train_label, pred_train)
+
             # テストデータに対する精度
             pred_test = linear_svc.predict(test_X)
             accuracy_test = accuracy_score(test_label, pred_test)
-            print(f'omega_1: {omega_1}, テストデータに対する正解率： {accuracy_test:.2f}')
+            print(f'omega_1: {omega_1}, train acc: {accuracy_train:.2f}, test acc: {accuracy_test:.2f}')
             if accuracy_test > 0.85:
                 correct += 1
 

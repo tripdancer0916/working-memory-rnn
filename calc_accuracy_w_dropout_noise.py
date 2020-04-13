@@ -65,25 +65,25 @@ def main(config_path, sigma_in, signal_length):
         dropout_ratio = 0.05 * acc_idx
         # オリジナルの重み
         original_w_hh = model.w_hh.weight.data.clone()
-        mask = np.random.choice([0, 1], model.n_hid * model.n_hid, p=[dropout_ratio, 1-dropout_ratio])
-        mask = mask.reshape(model.n_hid, model.n_hid)
-        torch_mask = torch.from_numpy(mask).float().to(device)
-        new_w = torch.mul(original_w_hh, torch_mask)
-        model.w_hh.weight = torch.nn.Parameter(new_w, requires_grad=False)
 
         correct = 0
         num_data = 0
         # print('delta correct_rate')
-        for delta_idx in range(100):
+        for delta_idx in range(50):
+            mask = np.random.choice([0, 1], model.n_hid * model.n_hid, p=[dropout_ratio, 1 - dropout_ratio])
+            mask = mask.reshape(model.n_hid, model.n_hid)
+            torch_mask = torch.from_numpy(mask).float().to(device)
+            new_w = torch.mul(original_w_hh, torch_mask)
+            model.w_hh.weight = torch.nn.Parameter(new_w, requires_grad=False)
             while True:
                 delta = np.random.rand() * 8 - 4
                 if abs(delta) >= 1:
                     break
-            N = 200
+            N = 100
             output_list = np.zeros(N)
             input_signal = romo_signal(delta, N, signal_length, sigma_in)
-            input_signal_split = np.split(input_signal, 4)
-            for i in range(4):
+            input_signal_split = np.split(input_signal, 2)
+            for i in range(2):
                 hidden = torch.zeros(50, model.n_hid)
                 hidden = hidden.to(device)
                 inputs = torch.from_numpy(input_signal_split[i]).float()
@@ -91,7 +91,7 @@ def main(config_path, sigma_in, signal_length):
                 _, outputs, _, _ = model(inputs, hidden)
                 outputs_np = outputs.cpu().detach().numpy()
                 output_list[i * 50: (i + 1) * 50] = np.argmax(outputs_np[:, -1], axis=1)
-            num_data += 200
+            num_data += 100
             if delta > 0:
                 ans = 1
             else:

@@ -74,12 +74,12 @@ def main(config_path, sigma_in, signal_length):
         correct = 0
         num_data = 0
         # print('delta correct_rate')
-        for delta_idx in range(100):
+        for delta_idx in range(50):
             while True:
                 delta = np.random.rand() * 8 - 4
                 if abs(delta) >= 1:
                     break
-            N = 200
+            N = 100
             output_list = np.zeros(N)
             input_signal = romo_signal(delta, N, signal_length, sigma_in)
             input_signal_split = np.split(input_signal, 4)
@@ -91,7 +91,7 @@ def main(config_path, sigma_in, signal_length):
                 _, outputs, _, _ = model(inputs, hidden)
                 outputs_np = outputs.cpu().detach().numpy()
                 output_list[i * 50: (i + 1) * 50] = np.argmax(outputs_np[:, -1], axis=1)
-            num_data += 200
+            num_data += 100
             if delta > 0:
                 ans = 1
             else:

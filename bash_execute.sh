@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-nohup python -u calc_accuracy_w_synaptic_noise.py cfg/romo_config/1_var_1.cfg &
-nohup python -u calc_accuracy_w_synaptic_noise.py cfg/romo_config/1_var_2.cfg &
-nohup python -u calc_accuracy_w_synaptic_noise.py cfg/romo_config/1_var_3.cfg &
-
-wait
-
 nohup python -u calc_accuracy_w_synaptic_noise.py cfg/romo_config/1_var_4.cfg &
 nohup python -u calc_accuracy_w_synaptic_noise.py cfg/romo_config/1_var_5.cfg &
 nohup python -u calc_accuracy_w_synaptic_noise.py cfg/romo_config/1_var_6.cfg &

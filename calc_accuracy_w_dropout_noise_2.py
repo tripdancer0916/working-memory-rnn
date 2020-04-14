@@ -72,7 +72,7 @@ def main(config_path, sigma_in, signal_length):
             torch_mask = torch.from_numpy(mask).float().to(device)
             new_w = torch.mul(original_w_hh, torch_mask)
             model.w_hh.weight = torch.nn.Parameter(new_w, requires_grad=False)
-            for delta_idx in range(25):
+            for delta_idx in range(10):
                 while True:
                     delta = np.random.rand() * 8 - 4
                     if abs(delta) >= 1:

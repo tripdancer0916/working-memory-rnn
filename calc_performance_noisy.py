@@ -56,7 +56,7 @@ def main(config_path, sigma_in, signal_length):
                                        use_bias=cfg['MODEL']['USE_BIAS'],
                                        anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-        model_path = f'trained_model/romo/{model_name}/epoch_500.pth'
+        model_path = f'trained_model/romo/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
         model.load_state_dict(torch.load(model_path, map_location=device))
 
         model.eval()
@@ -64,16 +64,16 @@ def main(config_path, sigma_in, signal_length):
         correct = 0
         num_data = 0
         # print('delta correct_rate')
-        for delta_idx in range(100):
+        for delta_idx in range(50):
             while True:
                 delta = np.random.rand() * 8 - 4
                 if abs(delta) >= 1:
                     break
-            N = 200
+            N = 100
             output_list = np.zeros(N)
             input_signal = romo_signal(delta, N, signal_length, sigma_in)
-            input_signal_split = np.split(input_signal, 4)
-            for i in range(4):
+            input_signal_split = np.split(input_signal, 2)
+            for i in range(2):
                 hidden = torch.zeros(50, model.n_hid)
                 hidden = hidden.to(device)
                 inputs = torch.from_numpy(input_signal_split[i]).float()
@@ -81,14 +81,14 @@ def main(config_path, sigma_in, signal_length):
                 _, outputs, _, _ = model(inputs, hidden)
                 outputs_np = outputs.cpu().detach().numpy()
                 output_list[i * 50: (i + 1) * 50] = np.argmax(outputs_np[:, -1], axis=1)
-            num_data += 200
+            num_data += 100
             if delta > 0:
                 ans = 1
             else:
                 ans = 0
             correct += (output_list == ans).sum()
-            if delta_idx % 10 == 0:
-                print(delta_idx, delta, (output_list == ans).sum() / 200)
+            # if delta_idx % 10 == 0:
+            #     print(delta_idx, delta, (output_list == ans).sum() / 200)
             # print(f'{delta:.3f}', (output_list == ans).sum() / 200)
 
         results_acc[acc_idx] = correct / num_data

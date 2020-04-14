@@ -11,19 +11,22 @@ from model import RecurrentNeuralNetwork
 def romo_signal(delta, N, signal_length, sigma_in, second_signal_timing):
     signals = np.zeros([N, 61, 1])
     freq_range = 4 - abs(delta)
+    first_signal_timing = 0
+    # second_signal_timing = 60 - signal_length
+    first_signal_freq = np.random.rand() * freq_range + max(1, 1 - delta)
+    second_signal_freq = first_signal_freq + delta
+    second_signal_length = 60 - second_signal_timing
     for i in range(N):
-        first_signal_timing = 0
-        # second_signal_timing = 60 - signal_length
-        first_signal_freq = np.random.rand() * freq_range + max(1, 1 - delta)
-        second_signal_freq = first_signal_freq + delta
         t = np.arange(0, signal_length / 4, 0.25)
         phase_shift_1 = np.random.rand() * np.pi
         first_signal = np.sin(first_signal_freq * t + phase_shift_1) + np.random.normal(0, sigma_in, signal_length)
+
+        t = np.arange(0, second_signal_length / 4, 0.25)
         phase_shift_2 = np.random.rand() * np.pi
-        second_signal = np.sin(second_signal_freq * t + phase_shift_2) + np.random.normal(0, sigma_in, signal_length)
+        second_signal = np.sin(second_signal_freq * t + phase_shift_2) + np.random.normal(0, sigma_in, second_signal_length)
 
         signals[i, first_signal_timing: first_signal_timing + signal_length, 0] = first_signal
-        signals[i, second_signal_timing: second_signal_timing + signal_length, 0] = second_signal
+        signals[i, second_signal_timing: second_signal_timing + second_signal_length, 0] = second_signal
 
     return signals
 
@@ -40,7 +43,6 @@ def main(config_path, sigma_in, signal_length):
     os.makedirs(save_path, exist_ok=True)
 
     print('memorization_duration accuracy')
-    # performanceは1つの学習済みモデルに対してsigma_neu^testを0から0.1まで変えてそれぞれの正解率を記録する。
     results_acc = np.zeros(10)
 
     for duration_idx in range(10):

@@ -47,7 +47,7 @@ def main(config_path, sigma_in, signal_length):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'trained_model/romo/{model_name}/epoch_500.pth'
+    model_path = f'trained_model/romo/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.eval()
@@ -59,8 +59,6 @@ def main(config_path, sigma_in, signal_length):
     # model 1
     deltas = np.arange(-2, 2, 0.05)
     N = 200
-    # signal_length = 25
-    # sigma_in = 0.05
     score = np.zeros(deltas.shape[0])
     delta_index = 0
     print('delta score')
@@ -88,8 +86,8 @@ def main(config_path, sigma_in, signal_length):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch RNN training')
     parser.add_argument('config_path', type=str)
-    parser.add_argument('--sigma_in', type=float, default=0.05)
-    parser.add_argument('--signal_length', type=int, default=25)
+    parser.add_argument('--sigma_in', type=float, default=0)
+    parser.add_argument('--signal_length', type=int, default=15)
     args = parser.parse_args()
     print(args)
     main(args.config_path, args.sigma_in, args.signal_length)

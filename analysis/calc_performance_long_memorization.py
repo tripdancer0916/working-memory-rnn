@@ -8,22 +8,25 @@ import yaml
 from model import RecurrentNeuralNetwork
 
 
-def romo_signal(delta, N, signal_length, sigma_in):
+def romo_signal(delta, N, signal_length, sigma_in, second_signal_timing):
     signals = np.zeros([N, 61, 1])
     freq_range = 4 - abs(delta)
+    first_signal_timing = 0
+    # second_signal_timing = 60 - signal_length
+    first_signal_freq = np.random.rand() * freq_range + max(1, 1 - delta)
+    second_signal_freq = first_signal_freq + delta
+    second_signal_length = 60 - second_signal_timing
     for i in range(N):
-        first_signal_timing = 0
-        second_signal_timing = 60 - signal_length
-        first_signal_freq = np.random.rand() * freq_range + max(1, 1 - delta)
-        second_signal_freq = first_signal_freq + delta
         t = np.arange(0, signal_length / 4, 0.25)
         phase_shift_1 = np.random.rand() * np.pi
         first_signal = np.sin(first_signal_freq * t + phase_shift_1) + np.random.normal(0, sigma_in, signal_length)
+
+        t = np.arange(0, second_signal_length / 4, 0.25)
         phase_shift_2 = np.random.rand() * np.pi
-        second_signal = np.sin(second_signal_freq * t + phase_shift_2) + np.random.normal(0, sigma_in, signal_length)
+        second_signal = np.sin(second_signal_freq * t + phase_shift_2) + np.random.normal(0, sigma_in, second_signal_length)
 
         signals[i, first_signal_timing: first_signal_timing + signal_length, 0] = first_signal
-        signals[i, second_signal_timing: second_signal_timing + signal_length, 0] = second_signal
+        signals[i, second_signal_timing: second_signal_timing + second_signal_length, 0] = second_signal
 
     return signals
 
@@ -36,18 +39,17 @@ def main(config_path, sigma_in, signal_length):
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
     os.makedirs('results/', exist_ok=True)
-    save_path = f'results/accuracy/'
+    save_path = f'results/accuracy_long_memorization/'
     os.makedirs(save_path, exist_ok=True)
 
-    print('sigma_neu accuracy')
-    # performanceは1つの学習済みモデルに対してsigma_neu^testを0から0.1まで変えてそれぞれの正解率を記録する。
-    results_acc = np.zeros(11)
+    print('memorization_duration accuracy')
+    results_acc = np.zeros(10)
 
-    for acc_idx in range(11):
+    for duration_idx in range(10):
         # モデルのロード
         torch.manual_seed(1)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        cfg['MODEL']['SIGMA_NEU'] = 0.01 * acc_idx
+        cfg['MODEL']['SIGMA_NEU'] = 0
         model = RecurrentNeuralNetwork(n_in=1, n_out=2, n_hid=cfg['MODEL']['SIZE'], device=device,
                                        alpha_time_scale=0.25, beta_time_scale=cfg['MODEL']['BETA'],
                                        activation=cfg['MODEL']['ACTIVATION'],
@@ -64,14 +66,14 @@ def main(config_path, sigma_in, signal_length):
         correct = 0
         num_data = 0
         # print('delta correct_rate')
-        for delta_idx in range(50):
+        for delta_idx in range(30):
             while True:
                 delta = np.random.rand() * 8 - 4
                 if abs(delta) >= 1:
                     break
             N = 100
             output_list = np.zeros(N)
-            input_signal = romo_signal(delta, N, signal_length, sigma_in)
+            input_signal = romo_signal(delta, N, signal_length, sigma_in, second_signal_timing=46+duration_idx)
             input_signal_split = np.split(input_signal, 2)
             for i in range(2):
                 hidden = torch.zeros(50, model.n_hid)
@@ -87,12 +89,9 @@ def main(config_path, sigma_in, signal_length):
             else:
                 ans = 0
             correct += (output_list == ans).sum()
-            if delta_idx % 10 == 0:
-                print(delta_idx, delta, (output_list == ans).sum() / 200)
-            # print(f'{delta:.3f}', (output_list == ans).sum() / 200)
 
-        results_acc[acc_idx] = correct / num_data
-        print(cfg['MODEL']['SIGMA_NEU'], correct / num_data)
+        results_acc[duration_idx] = correct / num_data
+        print(duration_idx+31, correct / num_data)
 
     np.save(os.path.join(save_path, f'{model_name}.npy'), results_acc)
 

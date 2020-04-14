@@ -14,7 +14,7 @@ sys.path.append('../')
 
 from torch.autograd import Variable
 
-from romo_dataset import RomoDataset, RomoDatasetVariableDelay
+from two_parameters_dataset import TwoParametersDataset
 from model import RecurrentNeuralNetwork
 
 
@@ -23,14 +23,12 @@ def main(config_path):
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
 
-    if 'ACTIVATION_REG' not in cfg['TRAIN'].keys():
-        cfg['TRAIN']['ACTIVATION_REG'] = 0
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
     # save path
     os.makedirs('trained_model', exist_ok=True)
-    os.makedirs('trained_model/romo', exist_ok=True)
-    save_path = f'trained_model/romo/{model_name}'
+    os.makedirs('trained_model/two_parameters', exist_ok=True)
+    save_path = f'trained_model/two_parameters/{model_name}'
     os.makedirs(save_path, exist_ok=True)
 
     # copy config file
@@ -41,7 +39,7 @@ def main(config_path):
     device = torch.device('cuda' if use_cuda else 'cpu')
     print(device)
 
-    model = RecurrentNeuralNetwork(n_in=1, n_out=2, n_hid=cfg['MODEL']['SIZE'], device=device,
+    model = RecurrentNeuralNetwork(n_in=1, n_out=4, n_hid=cfg['MODEL']['SIZE'], device=device,
                                    alpha_time_scale=0.25, beta_time_scale=cfg['MODEL']['BETA'],
                                    activation=cfg['MODEL']['ACTIVATION'],
                                    sigma_neu=cfg['MODEL']['SIGMA_NEU'],
@@ -49,21 +47,17 @@ def main(config_path):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    if 'var' in model_name:
-        train_dataset = RomoDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
-                                                 freq_min=cfg['DATALOADER']['FREQ_MIN'],
-                                                 freq_max=cfg['DATALOADER']['FREQ_MAX'],
-                                                 min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
-                                                 signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
-                                                 sigma_in=cfg['DATALOADER']['SIGMA_IN'],
-                                                 delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
-    else:
-        train_dataset = RomoDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
-                                    freq_min=cfg['DATALOADER']['FREQ_MIN'],
-                                    freq_max=cfg['DATALOADER']['FREQ_MAX'],
-                                    min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
-                                    signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
-                                    sigma_in=cfg['DATALOADER']['SIGMA_IN'])
+    train_dataset = TwoParametersDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                         freq_min=cfg['DATALOADER']['FREQ_MIN'],
+                                         freq_max=cfg['DATALOADER']['FREQ_MAX'],
+                                         b_min=cfg['DATALOADER']['B_MIN'],
+                                         b_max=cfg['DATALOADER']['B_MAX'],
+                                         min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                         b_min_interval=cfg['DATALOADER']['B_MIN_INTERVAL'],
+                                         signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                         variable_signal_length=cfg['DATALOADER']['VARIABLE_SIGNAL_LENGTH'],
+                                         sigma_in=cfg['DATALOADER']['SIGMA_IN'],
+                                         delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
 
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
                                                    num_workers=2, shuffle=True,
@@ -93,12 +87,6 @@ def main(config_path):
             # print(output)
 
             loss = torch.nn.CrossEntropyLoss()(output[:, -1], target)
-            dummy_zero = torch.zeros([cfg['TRAIN']['BATCHSIZE'],
-                                      cfg['DATALOADER']['TIME_LENGTH'] + 1,
-                                      cfg['MODEL']['SIZE']]).float().to(device)
-            active_loss = torch.nn.MSELoss()(hidden_list, dummy_zero)
-
-            loss += cfg['TRAIN']['ACTIVATION_REG'] * active_loss
             loss.backward()
             optimizer.step()
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),
@@ -108,8 +96,6 @@ def main(config_path):
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
-            # print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
-            # print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
             correct = 0
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:

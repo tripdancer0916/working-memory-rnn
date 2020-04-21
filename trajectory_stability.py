@@ -153,10 +153,10 @@ def main(config_path, sigma_in, signal_length):
             hidden_list_np = hidden_list.cpu().detach().numpy()
             neural_dynamics[j, i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
-    traj_variance = np.zeros((sample_num, 30))
+    traj_variance = np.zeros((sample_num, model.n_hid, 30))
     for i in range(sample_num):
-        for j in range(256):
-            traj_variance[i] = np.var(neural_dynamics[:, i, 15:45, j], axis=0)
+        for j in range(model.n_hid):
+            traj_variance[i, j] = np.var(neural_dynamics[:, i, 15:45, j], axis=0)
     np.save(os.path.join(save_path, f'{model_name}.npy'), traj_variance)
 
 

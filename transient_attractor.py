@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import yaml
+from sklearn.decomposition import PCA
 
 
 class RecurrentNeuralNetwork(nn.Module):
@@ -129,37 +130,57 @@ def main(config_path, signal_length):
 
     model.eval()
 
+    trial_num = 20
     sample_num = 10
 
-    input_signal, omega_1_list, omega_2_list = romo_signal(
-        sample_num, signal_length=signal_length, sigma_in=0.05)
+    explained_variance_ratio = np.zeros([200, 5, 256])
 
-    neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
+    for trial_id in range(trial_num):
+        print('trial_id: ', trial_id)
+        perturb_timing = np.random.choice(range(20, 40))
+        input_signal, omega_1_list, omega_2_list = romo_signal(
+            sample_num, signal_length=signal_length, sigma_in=0.05)
 
-    hidden = torch.zeros(sample_num, model.n_hid)
-    hidden = hidden.to(device)
-    inputs = torch.from_numpy(input_signal).float()
-    inputs = inputs.to(device)
+        neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
 
-    hidden_list, outputs, _ = model(inputs, hidden, 20, 0)
-    hidden_list_np = hidden_list.cpu().detach().numpy()
-    neural_dynamics[0, :] = hidden_list_np[:, 15:45, :]
-
-    for trial in range(1, 1000):
-        if trial % 100 == 0:
-            print('trial: ', trial)
         hidden = torch.zeros(sample_num, model.n_hid)
         hidden = hidden.to(device)
         inputs = torch.from_numpy(input_signal).float()
         inputs = inputs.to(device)
 
-        hidden_list, outputs, _ = model(inputs, hidden, 20, 0.05)
+        hidden_list, outputs, _ = model(inputs, hidden, perturb_timing, 0)
         hidden_list_np = hidden_list.cpu().detach().numpy()
-        neural_dynamics[trial, :] = hidden_list_np[:, 15:45, :]
+        neural_dynamics[0, :] = hidden_list_np[:, 15:45, :]
 
-    print(neural_dynamics.shape)
+        for trial in range(1, 1000):
+            hidden = torch.zeros(sample_num, model.n_hid)
+            hidden = hidden.to(device)
+            inputs = torch.from_numpy(input_signal).float()
+            inputs = inputs.to(device)
 
-    np.save(os.path.join(save_path, f'{model_name}.npy'), neural_dynamics)
+            hidden_list, outputs, _ = model(
+                inputs, hidden, perturb_timing, 0.05)
+            hidden_list_np = hidden_list.cpu().detach().numpy()
+            neural_dynamics[trial, :] = hidden_list_np[:, 15:45, :]
+
+        for sample_id in range(sample_num):
+            for elapsed_time in range(5):
+                pca = PCA()
+                pca.fit(neural_dynamics[:,
+                                        sample_id,
+                                        5 + elapsed_time,
+                                        :] - neural_dynamics[:1,
+                                                             sample_id,
+                                                             5 + elapsed_time,
+                                                             :])
+                explained_variance_ratio[trial_id * sample_num + sample_id,
+                                         elapsed_time, :] = pca.explained_variance_ratio_
+
+    np.save(
+        os.path.join(
+            save_path,
+            f'{model_name}.npy'),
+        explained_variance_ratio)
 
 
 if __name__ == '__main__':

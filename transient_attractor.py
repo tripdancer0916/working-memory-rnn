@@ -134,10 +134,11 @@ def main(config_path, signal_length):
     sample_num = 10
 
     explained_variance_ratio = np.zeros([20, sample_num, 5, 256])
+    norm_change = np.zeros([20, 30])
 
     for trial_id in range(trial_num):
         print('trial_id: ', trial_id)
-        perturb_timing = 20 + trial_num
+        perturb_timing = 20 + trial_id
         input_signal, omega_1_list, omega_2_list = romo_signal(
             sample_num, signal_length=signal_length, sigma_in=0.05)
 
@@ -177,11 +178,15 @@ def main(config_path, signal_length):
                 explained_variance_ratio[trial_id * sample_num + sample_id,
                                          elapsed_time, :] = pca.explained_variance_ratio_
 
+        noise = neural_dynamics[:, :, :, :] - neural_dynamics[:1, :, :, :]
+        norm_change[trial_id] = np.mean(np.linalg.norm(noise, axis=3), axis=(0, 1))
+
     np.save(
         os.path.join(
             save_path,
             f'{model_name}.npy'),
         explained_variance_ratio)
+    np.save(os.path.join(save_path, f'norm_change_{model_name}.npy'), norm_change)
 
 
 if __name__ == '__main__':

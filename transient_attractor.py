@@ -133,39 +133,29 @@ def main(config_path, signal_length):
 
     input_signal, omega_1_list, omega_2_list = romo_signal(
         sample_num, signal_length=signal_length, sigma_in=0.05)
-    input_signal_split = np.split(
-        input_signal,
-        sample_num //
-        cfg['TRAIN']['BATCHSIZE'])
 
     neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
-    # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。
-    for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):
-        hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
-        hidden = hidden.to(device)
-        inputs = torch.from_numpy(input_signal_split[i]).float()
-        inputs = inputs.to(device)
 
-        hidden_list, outputs, _ = model(inputs, hidden, 20, 0)
-        hidden_list_np = hidden_list.cpu().detach().numpy()
-        neural_dynamics[0, i *
-                        cfg['TRAIN']['BATCHSIZE']: (i + 1) *
-                        cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
+    hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
+    hidden = hidden.to(device)
+    inputs = torch.from_numpy(input_signal).float()
+    inputs = inputs.to(device)
+
+    hidden_list, outputs, _ = model(inputs, hidden, 20, 0)
+    hidden_list_np = hidden_list.cpu().detach().numpy()
+    neural_dynamics[0, :] = hidden_list_np[:, 15:45, :]
 
     for trial in range(1, 1000):
         if trial % 100 == 0:
             print('trial: ', trial)
-        for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):
-            hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
-            hidden = hidden.to(device)
-            inputs = torch.from_numpy(input_signal_split[i]).float()
-            inputs = inputs.to(device)
+        hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
+        hidden = hidden.to(device)
+        inputs = torch.from_numpy(input_signal).float()
+        inputs = inputs.to(device)
 
-            hidden_list, outputs, _ = model(inputs, hidden, 20, 0.05)
-            hidden_list_np = hidden_list.cpu().detach().numpy()
-            neural_dynamics[trial, i *
-                            cfg['TRAIN']['BATCHSIZE']: (i + 1) *
-                            cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
+        hidden_list, outputs, _ = model(inputs, hidden, 20, 0.05)
+        hidden_list_np = hidden_list.cpu().detach().numpy()
+        neural_dynamics[trial, :] = hidden_list_np[:, 15:45, :]
 
     print(neural_dynamics.shape)
 

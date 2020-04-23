@@ -131,7 +131,7 @@ def main(config_path, signal_length):
     model.eval()
 
     trial_num = 20
-    sample_num = 10
+    sample_num = 20
 
     explained_variance_ratio = np.zeros([20, sample_num, 5, 256])
     norm_change = np.zeros([20, 30])
@@ -174,8 +174,9 @@ def main(config_path, signal_length):
                                                              sample_id,
                                                              perturb_timing - 15 + elapsed_time,
                                                              :])
-                print(pca.explained_variance_ratio_[:10])
-                explained_variance_ratio[trial_id * sample_num + sample_id,
+                if elapsed_time == 4:
+                    print(pca.explained_variance_ratio_[:10])
+                explained_variance_ratio[trial_id, sample_id,
                                          elapsed_time, :] = pca.explained_variance_ratio_
 
         noise = neural_dynamics[:, :, :, :] - neural_dynamics[:1, :, :, :]

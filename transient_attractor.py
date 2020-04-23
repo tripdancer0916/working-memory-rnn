@@ -129,7 +129,7 @@ def main(config_path, signal_length):
 
     model.eval()
 
-    sample_num = 50
+    sample_num = 10
 
     input_signal, omega_1_list, omega_2_list = romo_signal(
         sample_num, signal_length=signal_length, sigma_in=0.05)
@@ -138,7 +138,7 @@ def main(config_path, signal_length):
         sample_num //
         cfg['TRAIN']['BATCHSIZE'])
 
-    neural_dynamics = np.zeros((100, sample_num, 30, model.n_hid))
+    neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
     # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。
     for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):
         hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
@@ -152,7 +152,7 @@ def main(config_path, signal_length):
                         cfg['TRAIN']['BATCHSIZE']: (i + 1) *
                         cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
 
-    for trial in range(1, 100):
+    for trial in range(1, 1000):
         if trial % 100 == 0:
             print('trial: ', trial)
         for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):

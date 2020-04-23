@@ -57,7 +57,8 @@ class RecurrentNeuralNetwork(nn.Module):
             tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated)
 
             if t == perturbation_timing:
-                neural_noise = self.make_neural_noise(hidden, self.alpha, sigma_neu)
+                neural_noise = self.make_neural_noise(
+                    hidden, self.alpha, sigma_neu)
                 hidden = (1 - self.alpha) * hidden + \
                     self.alpha * tmp_hidden + neural_noise
             else:
@@ -148,8 +149,8 @@ def main(config_path, signal_length):
         hidden_list, outputs, _ = model(inputs, hidden, 20, 0)
         hidden_list_np = hidden_list.cpu().detach().numpy()
         neural_dynamics[0, i *
-                               cfg['TRAIN']['BATCHSIZE']: (i + 1) *
-                                                          cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
+                        cfg['TRAIN']['BATCHSIZE']: (i + 1) *
+                        cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
 
     for trial in range(1, 1000):
         if trial % 100 == 0:

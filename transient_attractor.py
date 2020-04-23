@@ -129,7 +129,7 @@ def main(config_path, signal_length):
 
     model.eval()
 
-    sample_num = 400
+    sample_num = 100
 
     input_signal, omega_1_list, omega_2_list = romo_signal(
         sample_num, signal_length=signal_length, sigma_in=0.05)

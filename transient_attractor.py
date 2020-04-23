@@ -8,9 +8,19 @@ import yaml
 
 
 class RecurrentNeuralNetwork(nn.Module):
-    def __init__(self, n_in, n_out, n_hid, device,
-                 alpha_time_scale=0.25, beta_time_scale=0.1, activation='tanh', sigma_neu=0.05, sigma_syn=0.002,
-                 use_bias=True, anti_hebbian=True):
+    def __init__(
+            self,
+            n_in,
+            n_out,
+            n_hid,
+            device,
+            alpha_time_scale=0.25,
+            beta_time_scale=0.1,
+            activation='tanh',
+            sigma_neu=0.05,
+            sigma_syn=0.002,
+            use_bias=True,
+            anti_hebbian=True):
         super(RecurrentNeuralNetwork, self).__init__()
         self.n_in = n_in
         self.n_hid = n_hid
@@ -31,13 +41,18 @@ class RecurrentNeuralNetwork(nn.Module):
         self.anti_hebbian = anti_hebbian
 
     def make_neural_noise(self, hidden, alpha):
-        return torch.randn_like(hidden).to(self.device) * self.sigma_neu * torch.sqrt(alpha)
+        return torch.randn_like(hidden).to(
+            self.device) * self.sigma_neu * torch.sqrt(alpha)
 
     def forward(self, input_signal, hidden, perturbation_timing):
         num_batch = input_signal.size(0)
         length = input_signal.size(1)
-        hidden_list = torch.zeros(length, num_batch, self.n_hid).type_as(input_signal.data)
-        output_list = torch.zeros(length, num_batch, self.n_out).type_as(input_signal.data)
+        hidden_list = torch.zeros(
+            length, num_batch, self.n_hid).type_as(
+            input_signal.data)
+        output_list = torch.zeros(
+            length, num_batch, self.n_out).type_as(
+            input_signal.data)
 
         input_signal = input_signal.permute(1, 0, 2)
 
@@ -48,7 +63,8 @@ class RecurrentNeuralNetwork(nn.Module):
 
             if t == perturbation_timing:
                 neural_noise = self.make_neural_noise(hidden, self.alpha)
-                hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
+                hidden = (1 - self.alpha) * hidden + \
+                    self.alpha * tmp_hidden + neural_noise
             else:
                 hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden
 
@@ -74,10 +90,14 @@ def romo_signal(batch_size, signal_length, sigma_in):
         first_signal_timing = 0
         second_signal_timing = 60 - signal_length
         t = np.arange(0, signal_length / 4, 0.25)
-        first_signal = np.sin(omega_1 * t + phase_shift_1) + np.random.normal(0, sigma_in, signal_length)
-        second_signal = np.sin(omega_2 * t + phase_shift_2) + np.random.normal(0, sigma_in, signal_length)
-        signals[i, first_signal_timing: first_signal_timing + signal_length, 0] = first_signal
-        signals[i, second_signal_timing: second_signal_timing + signal_length, 0] = second_signal
+        first_signal = np.sin(omega_1 * t + phase_shift_1) + \
+            np.random.normal(0, sigma_in, signal_length)
+        second_signal = np.sin(omega_2 * t + phase_shift_2) + \
+            np.random.normal(0, sigma_in, signal_length)
+        signals[i, first_signal_timing: first_signal_timing +
+                signal_length, 0] = first_signal
+        signals[i, second_signal_timing: second_signal_timing +
+                signal_length, 0] = second_signal
 
     return signals, omega_1_list, omega_2_list
 
@@ -97,13 +117,18 @@ def main(config_path, signal_length):
     torch.manual_seed(1)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     cfg['MODEL']['SIGMA_NEU'] = 0.05
-    model = RecurrentNeuralNetwork(n_in=1, n_out=2, n_hid=cfg['MODEL']['SIZE'], device=device,
-                                   alpha_time_scale=0.25, beta_time_scale=cfg['MODEL']['BETA'],
-                                   activation=cfg['MODEL']['ACTIVATION'],
-                                   sigma_neu=cfg['MODEL']['SIGMA_NEU'],
-                                   sigma_syn=cfg['MODEL']['SIGMA_SYN'],
-                                   use_bias=cfg['MODEL']['USE_BIAS'],
-                                   anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
+    model = RecurrentNeuralNetwork(
+        n_in=1,
+        n_out=2,
+        n_hid=cfg['MODEL']['SIZE'],
+        device=device,
+        alpha_time_scale=0.25,
+        beta_time_scale=cfg['MODEL']['BETA'],
+        activation=cfg['MODEL']['ACTIVATION'],
+        sigma_neu=cfg['MODEL']['SIGMA_NEU'],
+        sigma_syn=cfg['MODEL']['SIGMA_SYN'],
+        use_bias=cfg['MODEL']['USE_BIAS'],
+        anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
     model_path = f'trained_model/romo/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
@@ -112,12 +137,16 @@ def main(config_path, signal_length):
 
     sample_num = 400
 
-    input_signal, omega_1_list, omega_2_list = romo_signal(sample_num, signal_length=signal_length, sigma_in=0.05)
-    input_signal_split = np.split(input_signal, sample_num // cfg['TRAIN']['BATCHSIZE'])
+    input_signal, omega_1_list, omega_2_list = romo_signal(
+        sample_num, signal_length=signal_length, sigma_in=0.05)
+    input_signal_split = np.split(
+        input_signal,
+        sample_num //
+        cfg['TRAIN']['BATCHSIZE'])
 
-    neural_dynamics = np.zeros((5000, sample_num, 61, model.n_hid))
+    neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
     # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。
-    for trial in range(5000):
+    for trial in range(1000):
         if trial % 100 == 0:
             print('trial: ', trial)
         for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):
@@ -128,7 +157,9 @@ def main(config_path, signal_length):
 
             hidden_list, outputs, _ = model(inputs, hidden, 20)
             hidden_list_np = hidden_list.cpu().detach().numpy()
-            neural_dynamics[trial, i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
+            neural_dynamics[trial, i *
+                            cfg['TRAIN']['BATCHSIZE']: (i + 1) *
+                            cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
 
     np.save(os.path.join(save_path, f'{model_name}.npy'), neural_dynamics)
 

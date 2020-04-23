@@ -17,8 +17,6 @@ class RecurrentNeuralNetwork(nn.Module):
             alpha_time_scale=0.25,
             beta_time_scale=0.1,
             activation='tanh',
-            sigma_neu=0.05,
-            sigma_syn=0.002,
             use_bias=True,
             anti_hebbian=True):
         super(RecurrentNeuralNetwork, self).__init__()
@@ -30,8 +28,6 @@ class RecurrentNeuralNetwork(nn.Module):
         self.w_out = nn.Linear(n_hid, n_out, bias=False)
 
         self.activation = activation
-        self.sigma_neu = sigma_neu
-        self.sigma_syn = sigma_syn
         self.device = device
 
         self.alpha = torch.ones(self.n_hid) * alpha_time_scale
@@ -40,11 +36,11 @@ class RecurrentNeuralNetwork(nn.Module):
         self.beta = self.beta.to(self.device)
         self.anti_hebbian = anti_hebbian
 
-    def make_neural_noise(self, hidden, alpha):
+    def make_neural_noise(self, hidden, alpha, sigma_neu):
         return torch.randn_like(hidden).to(
-            self.device) * self.sigma_neu * torch.sqrt(alpha)
+            self.device) * sigma_neu * torch.sqrt(alpha)
 
-    def forward(self, input_signal, hidden, perturbation_timing):
+    def forward(self, input_signal, hidden, perturbation_timing, sigma_neu):
         num_batch = input_signal.size(0)
         length = input_signal.size(1)
         hidden_list = torch.zeros(
@@ -58,11 +54,10 @@ class RecurrentNeuralNetwork(nn.Module):
 
         for t in range(length):
             activated = torch.tanh(hidden)
-            # print(torch.norm(different_j_activity).item())
             tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated)
 
             if t == perturbation_timing:
-                neural_noise = self.make_neural_noise(hidden, self.alpha)
+                neural_noise = self.make_neural_noise(hidden, self.alpha, sigma_neu)
                 hidden = (1 - self.alpha) * hidden + \
                     self.alpha * tmp_hidden + neural_noise
             else:
@@ -125,8 +120,6 @@ def main(config_path, signal_length):
         alpha_time_scale=0.25,
         beta_time_scale=cfg['MODEL']['BETA'],
         activation=cfg['MODEL']['ACTIVATION'],
-        sigma_neu=cfg['MODEL']['SIGMA_NEU'],
-        sigma_syn=cfg['MODEL']['SIGMA_SYN'],
         use_bias=cfg['MODEL']['USE_BIAS'],
         anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
@@ -146,7 +139,19 @@ def main(config_path, signal_length):
 
     neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
     # メモリを圧迫しないために推論はバッチサイズごとに分けて行う。
-    for trial in range(1000):
+    for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):
+        hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
+        hidden = hidden.to(device)
+        inputs = torch.from_numpy(input_signal_split[i]).float()
+        inputs = inputs.to(device)
+
+        hidden_list, outputs, _ = model(inputs, hidden, 20, 0)
+        hidden_list_np = hidden_list.cpu().detach().numpy()
+        neural_dynamics[0, i *
+                               cfg['TRAIN']['BATCHSIZE']: (i + 1) *
+                                                          cfg['TRAIN']['BATCHSIZE']] = hidden_list_np[:, 15:45, :]
+
+    for trial in range(1, 1000):
         if trial % 100 == 0:
             print('trial: ', trial)
         for i in range(sample_num // cfg['TRAIN']['BATCHSIZE']):
@@ -155,7 +160,7 @@ def main(config_path, signal_length):
             inputs = torch.from_numpy(input_signal_split[i]).float()
             inputs = inputs.to(device)
 
-            hidden_list, outputs, _ = model(inputs, hidden, 20)
+            hidden_list, outputs, _ = model(inputs, hidden, 20, 0.05)
             hidden_list_np = hidden_list.cpu().detach().numpy()
             neural_dynamics[trial, i *
                             cfg['TRAIN']['BATCHSIZE']: (i + 1) *

@@ -133,11 +133,11 @@ def main(config_path, signal_length):
     trial_num = 20
     sample_num = 10
 
-    explained_variance_ratio = np.zeros([200, 5, 256])
+    explained_variance_ratio = np.zeros([20, sample_num, 5, 256])
 
     for trial_id in range(trial_num):
         print('trial_id: ', trial_id)
-        perturb_timing = np.random.choice(range(20, 40))
+        perturb_timing = 20 + trial_num
         input_signal, omega_1_list, omega_2_list = romo_signal(
             sample_num, signal_length=signal_length, sigma_in=0.05)
 

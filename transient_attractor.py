@@ -171,7 +171,7 @@ def main(config_path, signal_length):
                                         perturb_timing - 15 + elapsed_time,
                                         :] - neural_dynamics[:1,
                                                              sample_id,
-                                                             perturb_timing + elapsed_time,
+                                                             perturb_timing - 15 + elapsed_time,
                                                              :])
                 print(pca.explained_variance_ratio_[:10])
                 explained_variance_ratio[trial_id * sample_num + sample_id,

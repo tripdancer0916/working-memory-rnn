@@ -136,7 +136,7 @@ def main(config_path, signal_length):
 
     neural_dynamics = np.zeros((1000, sample_num, 30, model.n_hid))
 
-    hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
+    hidden = torch.zeros(sample_num, model.n_hid)
     hidden = hidden.to(device)
     inputs = torch.from_numpy(input_signal).float()
     inputs = inputs.to(device)
@@ -148,7 +148,7 @@ def main(config_path, signal_length):
     for trial in range(1, 1000):
         if trial % 100 == 0:
             print('trial: ', trial)
-        hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], model.n_hid)
+        hidden = torch.zeros(sample_num, model.n_hid)
         hidden = hidden.to(device)
         inputs = torch.from_numpy(input_signal).float()
         inputs = inputs.to(device)

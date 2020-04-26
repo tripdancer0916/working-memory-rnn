@@ -23,6 +23,8 @@ def main(config_path):
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
 
+    if 'ACTIVATION_REG' not in cfg['TRAIN'].keys():
+        cfg['TRAIN']['ACTIVATION_REG'] = 0
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
     # save path
@@ -91,6 +93,12 @@ def main(config_path):
             # print(output)
 
             loss = torch.nn.CrossEntropyLoss()(output[:, -1], target)
+            dummy_zero = torch.zeros([cfg['TRAIN']['BATCHSIZE'],
+                                      cfg['DATALOADER']['TIME_LENGTH'] + 1,
+                                      cfg['MODEL']['SIZE']]).float().to(device)
+            active_loss = torch.nn.MSELoss()(hidden_list, dummy_zero)
+
+            loss += cfg['TRAIN']['ACTIVATION_REG'] * active_loss
             loss.backward()
             optimizer.step()
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),

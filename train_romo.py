@@ -98,6 +98,8 @@ def main(config_path):
                                       cfg['MODEL']['SIZE']]).float().to(device)
             active_loss = torch.nn.MSELoss()(hidden_list, dummy_zero)
 
+            print('loss: ', loss, 'active_loss: ', active_loss)
+
             loss += cfg['TRAIN']['ACTIVATION_REG'] * active_loss
             loss.backward()
             optimizer.step()

@@ -2,6 +2,7 @@
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class RecurrentNeuralNetwork(nn.Module):
@@ -56,21 +57,30 @@ class RecurrentNeuralNetwork(nn.Module):
         additional_w = torch.zeros((num_batch, self.n_hid, self.n_hid)).to(self.device)
         new_j = self.w_hh.weight
         for t in range(length):
-            activated = torch.tanh(hidden)
-
-            different_j_activity = torch.matmul(activated.unsqueeze(1), different_j).squeeze(1)
-            # print(torch.norm(different_j_activity).item())
-            tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated) + different_j_activity
-
-            neural_noise = self.make_neural_noise(hidden, self.alpha)
-            hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
-
-            if self.anti_hebbian:
-                additional_w = self.anti_hebbian_synaptic_plasticity(num_batch, activated, additional_w, self.beta)
+            if self.activation == 'tanh':
+                activated = torch.tanh(hidden)
+            elif self.activation == 'relu':
+                activated = F.relu(hidden)
             else:
-                additional_w = self.hebbian_synaptic_plasticity(num_batch, activated, additional_w, self.beta)
-            new_j = new_j + self.beta * additional_w
-            different_j = new_j - self.w_hh.weight
+                raise ValueError
+
+            if self.beta == 0:
+                tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated)
+                neural_noise = self.make_neural_noise(hidden, self.alpha)
+                hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
+            else:
+                different_j_activity = torch.matmul(activated.unsqueeze(1), different_j).squeeze(1)
+                tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated) + different_j_activity
+
+                neural_noise = self.make_neural_noise(hidden, self.alpha)
+                hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
+
+                if self.anti_hebbian:
+                    additional_w = self.anti_hebbian_synaptic_plasticity(num_batch, activated, additional_w, self.beta)
+                else:
+                    additional_w = self.hebbian_synaptic_plasticity(num_batch, activated, additional_w, self.beta)
+                new_j = new_j + self.beta * additional_w
+                different_j = new_j - self.w_hh.weight
 
             output = self.w_out(hidden)
             hidden_list[t] = hidden

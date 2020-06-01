@@ -39,14 +39,16 @@ class DistDataset(data.Dataset):
 
         # first signal
         t = np.arange(0, self.signal_length / 4, 0.25)
-        phase_shift = np.random.rand() * np.pi
+        # phase_shift = np.random.rand() * np.pi
+        phase_shift = 0
         first_signal = np.sin(self.freq * t + phase_shift) + \
             np.random.normal(0, first_signal_sigma, self.signal_length)
         signal[first_signal_timing: first_signal_timing +
                self.signal_length] = first_signal
 
         # second signal
-        phase_shift = np.random.rand() * np.pi
+        # phase_shift = np.random.rand() * np.pi
+        phase_shift = 0
         second_signal = np.sin(self.freq * t + phase_shift) + \
             np.random.normal(0, second_signal_sigma, self.signal_length)
         signal[second_signal_timing:second_signal_timing +
@@ -103,7 +105,8 @@ class DistDatasetVariableDelay(data.Dataset):
 
         # first signal
         t = np.arange(0, self.signal_length / 4, 0.25)
-        phase_shift = np.random.rand() * np.pi
+        # phase_shift = np.random.rand() * np.pi
+        phase_shift = 0
         first_signal = np.sin(self.freq * t + phase_shift) + \
             np.random.normal(0, first_signal_sigma, self.signal_length)
         signal[first_signal_timing: first_signal_timing +
@@ -111,7 +114,8 @@ class DistDatasetVariableDelay(data.Dataset):
 
         # second signal
         t = np.arange(0, second_signal_length / 4, 0.25)
-        phase_shift = np.random.rand() * np.pi
+        # phase_shift = np.random.rand() * np.pi
+        phase_shift = 0
         second_signal = np.sin(self.freq * t + phase_shift) + \
             np.random.normal(0, second_signal_sigma, second_signal_length)
         signal[second_signal_timing:second_signal_timing +

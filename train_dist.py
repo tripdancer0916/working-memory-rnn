@@ -105,6 +105,34 @@ def main(config_path):
                                   axis=1) == target.cpu().detach().numpy()).sum().item()
             num_data += target.cpu().detach().numpy().shape[0]
 
+            if float(loss.item()) < 0.6:
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 3
+                print("cfg['DATALOADER']['VARIABLE_DELAY'] = 3")
+                train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                                         sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
+                                                         sigma_max=cfg['DATALOADER']['SIGMA_MAX'],
+                                                         min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                                         signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                                         freq=cfg['DATALOADER']['FREQ'],
+                                                         delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
+                                                               num_workers=2, shuffle=True,
+                                                               worker_init_fn=lambda x: np.random.seed())
+
+            if float(loss.item()) < 0.3:
+                cfg['DATALOADER']['TIME_LENGTH'] = 6
+                print("cfg['DATALOADER']['TIME_LENGTH'] = 6")
+                train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                                         sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
+                                                         sigma_max=cfg['DATALOADER']['SIGMA_MAX'],
+                                                         min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                                         signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                                         freq=cfg['DATALOADER']['FREQ'],
+                                                         delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
+                                                               num_workers=2, shuffle=True,
+                                                               worker_init_fn=lambda x: np.random.seed())
+
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')

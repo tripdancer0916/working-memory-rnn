@@ -83,13 +83,14 @@ def main(config_path):
             # print(output)
 
             loss = torch.nn.CrossEntropyLoss()(output[:, -1], target)
+            """
             dummy_zero = torch.zeros([cfg['TRAIN']['BATCHSIZE'],
                                       cfg['DATALOADER']['TIME_LENGTH'] + 1,
                                       cfg['MODEL']['SIZE']]).float().to(device)
             active_norm = torch.nn.MSELoss()(hidden_list, dummy_zero)
-            norm_reg_loss = active_norm - torch.
 
-            loss += cfg['TRAIN']['ACTIVATION_LAMBDA'] * active_loss
+            loss += cfg['TRAIN']['ACTIVATION_LAMBDA'] * active_norm
+            """
             loss.backward()
             optimizer.step()
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),

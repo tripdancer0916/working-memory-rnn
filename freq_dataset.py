@@ -35,7 +35,7 @@ class FreqDataset(data.Dataset):
         first_signal_length = self.signal_length + vs
         v = np.random.randint(-self.delay_variable, self.delay_variable + 1)
         second_signal_timing = self.time_length - first_signal_length + v
-        second_signal_length = self.signal_length - v
+        second_signal_length = self.signal_length - v - vs
 
         first_signal_freq = np.random.rand() * (self.freq_max - self.freq_min) + \
             self.freq_min

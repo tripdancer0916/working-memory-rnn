@@ -122,6 +122,7 @@ def main(config_path):
                 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
+                break
 
             if not phase3 and float(loss.item()) < 0.4:
                 cfg['DATALOADER']['MIN_INTERVAL'] = 0.1
@@ -138,6 +139,7 @@ def main(config_path):
                 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
+                break
 
             if not phase4 and epoch == 12:
                 cfg['DATALOADER']['TIME_LENGTH'] = 60
@@ -153,6 +155,7 @@ def main(config_path):
                 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
+                break
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data

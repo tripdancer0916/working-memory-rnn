@@ -73,6 +73,7 @@ def main(config_path):
     phase3 = False
     phase4 = False
     phase5 = False
+    phase6 = False
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()
         for i, data in enumerate(train_dataloader):
@@ -139,8 +140,8 @@ def main(config_path):
                 break
 
             if not phase4 and float(loss.item()) < 0.4:
-                cfg['DATALOADER']['PHASE_SHIFT'] = 0.3
-                print("phase4 start! cfg['DATALOADER']['PHASE_SHIFT'] = 0.3")
+                cfg['DATALOADER']['PHASE_SHIFT'] = 0.5
+                print("phase4 start! cfg['DATALOADER']['PHASE_SHIFT'] = 0.5")
                 phase4 = True
                 train_dataset = DistDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
@@ -160,6 +161,23 @@ def main(config_path):
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 15
                 print("phase5 start! cfg['DATALOADER']['TIME_LENGTH'] = 60, cfg['DATALOADER']['SIGNAL_LENGTH'] = 15")
                 phase5 = True
+                train_dataset = DistDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                            sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
+                                            sigma_max=cfg['DATALOADER']['SIGMA_MAX'],
+                                            min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                            signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                            freq=cfg['DATALOADER']['FREQ'],
+                                            delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'],
+                                            phase_shift=cfg['DATALOADER']['PHASE_SHIFT'])
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
+                                                               num_workers=2, shuffle=True,
+                                                               worker_init_fn=lambda x: np.random.seed())
+                break
+
+            if not phase6 and float(loss.item()) < 0.25:
+                cfg['DATALOADER']['PHASE_SHIFT'] = 1
+                print("phase6 start! cfg['DATALOADER']['PHASE_SHIFT'] = 1")
+                phase6 = True
                 train_dataset = DistDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
                                             sigma_max=cfg['DATALOADER']['SIGMA_MAX'],

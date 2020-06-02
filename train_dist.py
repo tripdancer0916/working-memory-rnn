@@ -127,7 +127,7 @@ def main(config_path):
             if not phase3 and float(loss.item()) < 0.4:
                 cfg['DATALOADER']['MIN_INTERVAL'] = 0.1
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 5
-                print("phase3 start! cfg['DATALOADER']['MIN_INTERVAL'] = 0.1")
+                print("phase3 start! cfg['DATALOADER']['MIN_INTERVAL'] = 0.1, cfg['DATALOADER']['VARIABLE_DELAY'] = 5")
                 phase3 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                                          sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
@@ -144,7 +144,7 @@ def main(config_path):
             if not phase4 and float(loss.item()) < 0.25:
                 cfg['DATALOADER']['TIME_LENGTH'] = 60
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 15
-                print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 60")
+                print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 60, cfg['DATALOADER']['SIGNAL_LENGTH'] = 15")
                 phase4 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                                          sigma_min=cfg['DATALOADER']['SIGMA_MIN'],

@@ -123,8 +123,9 @@ def main(config_path):
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
 
-            if not phase3 and float(loss.item()) < 0.5:
+            if not phase3 and float(loss.item()) < 0.4:
                 cfg['DATALOADER']['MIN_INTERVAL'] = 0.1
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 5
                 print("phase3 start! cfg['DATALOADER']['MIN_INTERVAL'] = 0.1")
                 phase3 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
@@ -138,8 +139,8 @@ def main(config_path):
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
 
-            if not phase4 and float(loss.item()) < 0.3:
-                cfg['DATALOADER']['TIME_LENGTH'] = 6
+            if not phase4 and float(loss.item()) < 0.2:
+                cfg['DATALOADER']['TIME_LENGTH'] = 60
                 print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 6")
                 phase4 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],

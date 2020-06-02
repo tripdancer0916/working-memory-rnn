@@ -76,6 +76,9 @@ def main(config_path):
                            lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
     correct = 0
     num_data = 0
+    phase2 = False
+    phase3 = False
+    phase4 = False
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()
         for i, data in enumerate(train_dataloader):
@@ -105,9 +108,10 @@ def main(config_path):
                                   axis=1) == target.cpu().detach().numpy()).sum().item()
             num_data += target.cpu().detach().numpy().shape[0]
 
-            if float(loss.item()) < 0.6:
+            if not phase2 and float(loss.item()) < 0.6:
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 3
-                print("cfg['DATALOADER']['VARIABLE_DELAY'] = 3")
+                print("phase2 start! cfg['DATALOADER']['VARIABLE_DELAY'] = 3")
+                phase2 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                                          sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
                                                          sigma_max=cfg['DATALOADER']['SIGMA_MAX'],
@@ -119,9 +123,25 @@ def main(config_path):
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
 
-            if float(loss.item()) < 0.3:
+            if not phase3 and float(loss.item()) < 0.5:
+                cfg['DATALOADER']['MIN_INTERVAL'] = 0.1
+                print("phase3 start! cfg['DATALOADER']['MIN_INTERVAL'] = 0.1")
+                phase3 = True
+                train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                                         sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
+                                                         sigma_max=cfg['DATALOADER']['SIGMA_MAX'],
+                                                         min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                                         signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                                         freq=cfg['DATALOADER']['FREQ'],
+                                                         delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
+                                                               num_workers=2, shuffle=True,
+                                                               worker_init_fn=lambda x: np.random.seed())
+
+            if not phase4 and float(loss.item()) < 0.3:
                 cfg['DATALOADER']['TIME_LENGTH'] = 6
-                print("cfg['DATALOADER']['TIME_LENGTH'] = 6")
+                print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 6")
+                phase4 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                                          sigma_min=cfg['DATALOADER']['SIGMA_MIN'],
                                                          sigma_max=cfg['DATALOADER']['SIGMA_MAX'],

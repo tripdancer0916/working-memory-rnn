@@ -53,7 +53,7 @@ def main(config_path):
                                          b_min=cfg['DATALOADER']['B_MIN'],
                                          b_max=cfg['DATALOADER']['B_MAX'],
                                          min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
-                                         b_min_interval=cfg['DATALOADER']['B_MIN_INETRVAL'],
+                                         b_min_interval=cfg['DATALOADER']['B_MIN_INTERVAL'],
                                          signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
                                          variable_signal_length=cfg['DATALOADER']['VARIABLE_SIGNAL_LENGTH'],
                                          sigma_in=cfg['DATALOADER']['SIGMA_IN'],

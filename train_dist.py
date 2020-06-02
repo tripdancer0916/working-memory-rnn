@@ -139,7 +139,7 @@ def main(config_path):
                                                                num_workers=2, shuffle=True,
                                                                worker_init_fn=lambda x: np.random.seed())
 
-            if not phase4 and float(loss.item()) < 0.65:
+            if not phase4 and epoch == 12:
                 cfg['DATALOADER']['TIME_LENGTH'] = 60
                 print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 6")
                 phase4 = True

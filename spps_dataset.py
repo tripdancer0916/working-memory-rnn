@@ -37,15 +37,13 @@ class SPPSDataset(data.Dataset):
         first_signal_mu = first_signal_position * self.n_in / (self.num_positions - 1)
         first_prob = gauss(np.arange(0, self.n_in), mu=first_signal_mu, sigma=self.sigma_in)
         first_signal = np.random.binomial(1, p=first_prob, size=(self.signal_length, self.n_in))
-        signal[first_signal_timing: first_signal_timing +
-                                    self.signal_length] = first_signal
+        signal[first_signal_timing: first_signal_timing + self.signal_length] = first_signal
 
         second_signal_position = np.random.randint(self.num_positions)
         second_signal_mu = second_signal_position * self.n_in / (self.num_positions - 1)
         second_prob = gauss(np.arange(0, self.n_in), mu=second_signal_mu, sigma=self.sigma_in)
         second_signal = np.random.binomial(1, p=second_prob, size=(self.signal_length, self.n_in))
-        signal[second_signal_timing: second_signal_timing +
-                                     self.signal_length] = second_signal
+        signal[second_signal_timing: second_signal_timing + self.signal_length] = second_signal
 
         # target
         if first_signal_position > second_signal_position:

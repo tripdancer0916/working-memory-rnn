@@ -143,6 +143,7 @@ def main(config_path):
 
             if not phase4 and float(loss.item()) < 0.25:
                 cfg['DATALOADER']['TIME_LENGTH'] = 60
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 15
                 print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 60")
                 phase4 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],

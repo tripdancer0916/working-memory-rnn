@@ -141,9 +141,9 @@ def main(config_path):
                                                                worker_init_fn=lambda x: np.random.seed())
                 break
 
-            if not phase4 and epoch == 12:
+            if not phase4 and float(loss.item()) < 0.25:
                 cfg['DATALOADER']['TIME_LENGTH'] = 60
-                print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 6")
+                print("phase4 start! cfg['DATALOADER']['TIME_LENGTH'] = 60")
                 phase4 = True
                 train_dataset = DistDatasetVariableDelay(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                                          sigma_min=cfg['DATALOADER']['SIGMA_MIN'],

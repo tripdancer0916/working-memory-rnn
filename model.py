@@ -61,6 +61,8 @@ class RecurrentNeuralNetwork(nn.Module):
                 activated = torch.tanh(hidden)
             elif self.activation == 'relu':
                 activated = F.relu(hidden)
+            elif self.activation == 'identity':
+                activated = hidden
             else:
                 raise ValueError
 

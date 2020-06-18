@@ -84,14 +84,12 @@ def main(config_path):
             # print(output)
 
             loss = torch.nn.CrossEntropyLoss()(output[:, -1], target)
-            """
             dummy_zero = torch.zeros([cfg['TRAIN']['BATCHSIZE'],
                                       cfg['DATALOADER']['TIME_LENGTH'] + 1,
                                       cfg['MODEL']['SIZE']]).float().to(device)
             active_norm = torch.nn.MSELoss()(hidden_list, dummy_zero)
 
             loss += cfg['TRAIN']['ACTIVATION_LAMBDA'] * active_norm
-            """
             loss.backward()
             optimizer.step()
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),
@@ -101,6 +99,7 @@ def main(config_path):
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
+            print(active_norm)
             # print('w_hh: ', model.w_hh.weight.cpu().detach().numpy()[:4, :4])
             # print('new_j: ', new_j.cpu().detach().numpy()[0, :4, :4])
             correct = 0

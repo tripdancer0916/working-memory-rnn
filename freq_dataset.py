@@ -8,6 +8,7 @@ class FreqDataset(data.Dataset):
     def __init__(
             self,
             time_length,
+            time_scale,
             freq_min,
             freq_max,
             min_interval,
@@ -16,6 +17,7 @@ class FreqDataset(data.Dataset):
             sigma_in,
             delay_variable):
         self.time_length = time_length
+        self.time_scale = time_scale
         self.freq_min = freq_min
         self.freq_max = freq_max
         self.min_interval = min_interval
@@ -46,7 +48,7 @@ class FreqDataset(data.Dataset):
                 break
 
         # first signal
-        t = np.arange(0, first_signal_length / 4, 0.25)
+        t = np.arange(0, first_signal_length * self.time_scale, self.time_scale)
         phase_shift = np.random.rand() * np.pi
         first_signal = np.sin(first_signal_freq * t + phase_shift) + \
             np.random.normal(0, self.sigma_in, first_signal_length)
@@ -54,7 +56,7 @@ class FreqDataset(data.Dataset):
                first_signal_length] = first_signal
 
         # second signal
-        t = np.arange(0, second_signal_length / 4, 0.25)
+        t = np.arange(0, second_signal_length * self.time_scale, self.time_scale)
         phase_shift = np.random.rand() * np.pi
         second_signal = np.sin(second_signal_freq * t + phase_shift) + \
             np.random.normal(0, self.sigma_in, second_signal_length)

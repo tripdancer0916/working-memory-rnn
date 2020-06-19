@@ -39,8 +39,11 @@ def main(config_path):
     device = torch.device('cuda' if use_cuda else 'cpu')
     print(device)
 
+    if 'ALPHA' not in cfg['MODEL'].keys():
+        cfg['MODEL']['ALPHA'] = 0.25
+
     model = RecurrentNeuralNetwork(n_in=1, n_out=2, n_hid=cfg['MODEL']['SIZE'], device=device,
-                                   alpha_time_scale=0.25, beta_time_scale=cfg['MODEL']['BETA'],
+                                   alpha_time_scale=cfg['MODEL']['ALPHA'], beta_time_scale=cfg['MODEL']['BETA'],
                                    activation=cfg['MODEL']['ACTIVATION'],
                                    sigma_neu=cfg['MODEL']['SIGMA_NEU'],
                                    sigma_syn=cfg['MODEL']['SIGMA_SYN'],
@@ -48,6 +51,7 @@ def main(config_path):
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
     train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                time_scale=cfg['MODEL']['ALPHA'],
                                 freq_min=cfg['DATALOADER']['FREQ_MIN'],
                                 freq_max=cfg['DATALOADER']['FREQ_MAX'],
                                 min_interval=cfg['DATALOADER']['MIN_INTERVAL'],

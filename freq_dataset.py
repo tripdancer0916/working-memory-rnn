@@ -49,6 +49,8 @@ class FreqDataset(data.Dataset):
 
         # first signal
         t = np.arange(0, first_signal_length * self.time_scale, self.time_scale)
+        if len(t) != first_signal_length:
+            t = t[:-1]
         phase_shift = np.random.rand() * np.pi
         first_signal = np.sin(first_signal_freq * t + phase_shift) + \
             np.random.normal(0, self.sigma_in, first_signal_length)
@@ -57,6 +59,8 @@ class FreqDataset(data.Dataset):
 
         # second signal
         t = np.arange(0, second_signal_length * self.time_scale, self.time_scale)
+        if len(t) != second_signal_length:
+            t = t[:-1]
         phase_shift = np.random.rand() * np.pi
         second_signal = np.sin(second_signal_freq * t + phase_shift) + \
             np.random.normal(0, self.sigma_in, second_signal_length)

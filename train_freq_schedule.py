@@ -174,7 +174,7 @@ def main(config_path):
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 30
 
                 print("phase45 start! cfg['MODEL']['ALPHA'] = 0.1")
-                phase4 = True
+                phase5 = True
                 train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             time_scale=cfg['MODEL']['ALPHA'],
                                             freq_min=cfg['DATALOADER']['FREQ_MIN'],

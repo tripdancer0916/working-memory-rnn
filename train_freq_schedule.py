@@ -109,6 +109,7 @@ def main(config_path):
                 cfg['MODEL']['ALPHA'] = 0.2
                 cfg['DATALOADER']['TIME_LENGTH'] = 75
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 20
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 6
 
                 print("phase2 start! cfg['MODEL']['ALPHA'] = 0.2")
                 phase2 = True
@@ -130,6 +131,7 @@ def main(config_path):
                 cfg['MODEL']['ALPHA'] = 0.175
                 cfg['DATALOADER']['TIME_LENGTH'] = 82
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 22
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 7
 
                 print("phase3 start! cfg['MODEL']['ALPHA'] = 0.175")
                 phase3 = True
@@ -151,6 +153,7 @@ def main(config_path):
                 cfg['MODEL']['ALPHA'] = 0.15
                 cfg['DATALOADER']['TIME_LENGTH'] = 90
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 25
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 8
 
                 print("phase34 start! cfg['MODEL']['ALPHA'] = 0.15")
                 phase4 = True
@@ -172,6 +175,29 @@ def main(config_path):
                 cfg['MODEL']['ALPHA'] = 0.10
                 cfg['DATALOADER']['TIME_LENGTH'] = 120
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 30
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 10
+
+                print("phase45 start! cfg['MODEL']['ALPHA'] = 0.1")
+                phase5 = True
+                train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                            time_scale=cfg['MODEL']['ALPHA'],
+                                            freq_min=cfg['DATALOADER']['FREQ_MIN'],
+                                            freq_max=cfg['DATALOADER']['FREQ_MAX'],
+                                            min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                            signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                            variable_signal_length=cfg['DATALOADER']['VARIABLE_SIGNAL_LENGTH'],
+                                            sigma_in=cfg['DATALOADER']['SIGMA_IN'],
+                                            delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
+                                                               num_workers=2, shuffle=True,
+                                                               worker_init_fn=lambda x: np.random.seed())
+                break
+
+            if not phase6 and float(loss.item()) < 0.2:
+                cfg['MODEL']['ALPHA'] = 0.075
+                cfg['DATALOADER']['TIME_LENGTH'] = 200
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 50
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 15
 
                 print("phase45 start! cfg['MODEL']['ALPHA'] = 0.1")
                 phase5 = True

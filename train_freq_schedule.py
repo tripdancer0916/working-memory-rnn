@@ -76,6 +76,7 @@ def main(config_path):
     phase4 = False
     phase5 = False
     phase6 = False
+    phase7 = False
     if 'PHASE_TRANSIT' in cfg['TRAIN'].keys():
         phase_transition_criteria = cfg['TRAIN']['PHASE_TRANSIT']
     else:
@@ -205,6 +206,28 @@ def main(config_path):
 
                 print("phase6 start! cfg['MODEL']['ALPHA'] = 0.075")
                 phase6 = True
+                train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
+                                            time_scale=cfg['MODEL']['ALPHA'],
+                                            freq_min=cfg['DATALOADER']['FREQ_MIN'],
+                                            freq_max=cfg['DATALOADER']['FREQ_MAX'],
+                                            min_interval=cfg['DATALOADER']['MIN_INTERVAL'],
+                                            signal_length=cfg['DATALOADER']['SIGNAL_LENGTH'],
+                                            variable_signal_length=cfg['DATALOADER']['VARIABLE_SIGNAL_LENGTH'],
+                                            sigma_in=cfg['DATALOADER']['SIGMA_IN'],
+                                            delay_variable=cfg['DATALOADER']['VARIABLE_DELAY'])
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['TRAIN']['BATCHSIZE'],
+                                                               num_workers=2, shuffle=True,
+                                                               worker_init_fn=lambda x: np.random.seed())
+                break
+
+            if not phase7 and float(loss.item()) < phase_transition_criteria[5]:
+                cfg['MODEL']['ALPHA'] = 0.05
+                cfg['DATALOADER']['TIME_LENGTH'] = 300
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 70
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 22
+
+                print("phase7 start! cfg['MODEL']['ALPHA'] = 0.05")
+                phase7 = True
                 train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             time_scale=cfg['MODEL']['ALPHA'],
                                             freq_min=cfg['DATALOADER']['FREQ_MIN'],

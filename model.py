@@ -61,10 +61,12 @@ class RecurrentNeuralNetwork(nn.Module):
                 activated = torch.tanh(hidden)
             elif self.activation == 'relu':
                 activated = F.relu(hidden)
+            elif self.activation == 'identity':
+                activated = hidden
             else:
                 raise ValueError
 
-            if self.beta[0].item() == 0:
+            if self.beta[0].item() == 0:  # Short-term synaptic plasticityを考えない場合
                 tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated)
                 neural_noise = self.make_neural_noise(hidden, self.alpha)
                 hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise

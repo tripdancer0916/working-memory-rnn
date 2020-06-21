@@ -155,7 +155,7 @@ def main(config_path):
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 25
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 8
 
-                print("phase34 start! cfg['MODEL']['ALPHA'] = 0.15")
+                print("phase4 start! cfg['MODEL']['ALPHA'] = 0.15")
                 phase4 = True
                 train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             time_scale=cfg['MODEL']['ALPHA'],
@@ -177,7 +177,7 @@ def main(config_path):
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 30
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 10
 
-                print("phase45 start! cfg['MODEL']['ALPHA'] = 0.1")
+                print("phase5 start! cfg['MODEL']['ALPHA'] = 0.1")
                 phase5 = True
                 train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             time_scale=cfg['MODEL']['ALPHA'],
@@ -199,8 +199,8 @@ def main(config_path):
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 50
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 15
 
-                print("phase45 start! cfg['MODEL']['ALPHA'] = 0.1")
-                phase5 = True
+                print("phase6 start! cfg['MODEL']['ALPHA'] = 0.075")
+                phase6 = True
                 train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                             time_scale=cfg['MODEL']['ALPHA'],
                                             freq_min=cfg['DATALOADER']['FREQ_MIN'],

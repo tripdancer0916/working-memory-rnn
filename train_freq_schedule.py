@@ -221,10 +221,10 @@ def main(config_path):
                 break
 
             if not phase7 and float(loss.item()) < phase_transition_criteria[5]:
-                cfg['MODEL']['ALPHA'] = 0.05
-                cfg['DATALOADER']['TIME_LENGTH'] = 300
-                cfg['DATALOADER']['SIGNAL_LENGTH'] = 70
-                cfg['DATALOADER']['VARIABLE_DELAY'] = 22
+                cfg['MODEL']['ALPHA'] = 0.06
+                cfg['DATALOADER']['TIME_LENGTH'] = 250
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 60
+                cfg['DATALOADER']['VARIABLE_DELAY'] = 18
 
                 print("phase7 start! cfg['MODEL']['ALPHA'] = 0.05")
                 phase7 = True

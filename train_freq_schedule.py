@@ -76,6 +76,10 @@ def main(config_path):
     phase4 = False
     phase5 = False
     phase6 = False
+    if 'PHASE_TRANSIT' in cfg['TRAIN'].keys():
+        phase_transition_criteria = cfg['TRAIN']['PHASE_TRANSIT']
+    else:
+        phase_transition_criteria = [0.5, 0.45, 0.4, 0.3, 0.2]
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()
         for i, data in enumerate(train_dataloader):
@@ -105,7 +109,7 @@ def main(config_path):
                                   axis=1) == target.cpu().detach().numpy()).sum().item()
             num_data += target.cpu().detach().numpy().shape[0]
 
-            if not phase2 and float(loss.item()) < 0.5:
+            if not phase2 and float(loss.item()) < phase_transition_criteria[0]:
                 cfg['MODEL']['ALPHA'] = 0.2
                 cfg['DATALOADER']['TIME_LENGTH'] = 75
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 20
@@ -127,7 +131,7 @@ def main(config_path):
                                                                worker_init_fn=lambda x: np.random.seed())
                 break
 
-            if not phase3 and float(loss.item()) < 0.45:
+            if not phase3 and float(loss.item()) < phase_transition_criteria[1]:
                 cfg['MODEL']['ALPHA'] = 0.175
                 cfg['DATALOADER']['TIME_LENGTH'] = 82
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 22
@@ -149,7 +153,7 @@ def main(config_path):
                                                                worker_init_fn=lambda x: np.random.seed())
                 break
 
-            if not phase4 and float(loss.item()) < 0.4:
+            if not phase4 and float(loss.item()) < phase_transition_criteria[2]:
                 cfg['MODEL']['ALPHA'] = 0.15
                 cfg['DATALOADER']['TIME_LENGTH'] = 90
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 25
@@ -171,7 +175,7 @@ def main(config_path):
                                                                worker_init_fn=lambda x: np.random.seed())
                 break
 
-            if not phase5 and float(loss.item()) < 0.3:
+            if not phase5 and float(loss.item()) < phase_transition_criteria[3]:
                 cfg['MODEL']['ALPHA'] = 0.10
                 cfg['DATALOADER']['TIME_LENGTH'] = 120
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 30
@@ -193,7 +197,7 @@ def main(config_path):
                                                                worker_init_fn=lambda x: np.random.seed())
                 break
 
-            if not phase6 and float(loss.item()) < 0.2:
+            if not phase6 and float(loss.item()) < phase_transition_criteria[4]:
                 cfg['MODEL']['ALPHA'] = 0.075
                 cfg['DATALOADER']['TIME_LENGTH'] = 200
                 cfg['DATALOADER']['SIGNAL_LENGTH'] = 50

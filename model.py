@@ -108,7 +108,7 @@ class RecurrentNeuralNetwork2(nn.Module):
         self.n_out = n_out
         self.w_in = nn.Linear(n_in, n_hid, bias=False)
         self.w_hh = nn.Linear(n_hid, n_hid, bias=use_bias)
-        nn.init.uniform_(self.w_hh.weight, -0.2, 0.2)
+        nn.init.uniform_(self.w_hh.weight, -1, 1)
         self.w_out = nn.Linear(n_hid, n_out, bias=False)
 
         self.activation = activation

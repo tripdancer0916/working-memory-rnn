@@ -102,7 +102,7 @@ class RecurrentNeuralNetwork2(nn.Module):
     def __init__(self, n_in, n_out, n_hid, device,
                  alpha_time_scale=0.25, beta_time_scale=0.1, activation='tanh', sigma_neu=0.05, sigma_syn=0.002,
                  use_bias=True, anti_hebbian=True):
-        super(RecurrentNeuralNetwork, self).__init__()
+        super(RecurrentNeuralNetwork2, self).__init__()
         self.n_in = n_in
         self.n_hid = n_hid
         self.n_out = n_out

@@ -161,7 +161,7 @@ def main(config_path):
             if not phase4 and float(loss.item()) < phase_transition_criteria[2]:
                 cfg['MODEL']['ALPHA'] = 0.15
                 cfg['DATALOADER']['TIME_LENGTH'] = 120
-                cfg['DATALOADER']['SIGNAL_LENGTH'] = 30
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 25
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 8
 
                 print("phase4 start! cfg['MODEL']['ALPHA'] = 0.15")
@@ -184,7 +184,7 @@ def main(config_path):
             if not phase5 and float(loss.item()) < phase_transition_criteria[3]:
                 cfg['MODEL']['ALPHA'] = 0.10
                 cfg['DATALOADER']['TIME_LENGTH'] = 160
-                cfg['DATALOADER']['SIGNAL_LENGTH'] = 40
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 30
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 10
 
                 print("phase5 start! cfg['MODEL']['ALPHA'] = 0.1")
@@ -207,7 +207,7 @@ def main(config_path):
             if not phase6 and float(loss.item()) < phase_transition_criteria[4]:
                 cfg['MODEL']['ALPHA'] = 0.075
                 cfg['DATALOADER']['TIME_LENGTH'] = 267
-                cfg['DATALOADER']['SIGNAL_LENGTH'] = 65
+                cfg['DATALOADER']['SIGNAL_LENGTH'] = 50
                 cfg['DATALOADER']['VARIABLE_DELAY'] = 15
 
                 print("phase6 start! cfg['MODEL']['ALPHA'] = 0.075")

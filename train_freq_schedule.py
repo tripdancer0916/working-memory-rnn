@@ -27,8 +27,8 @@ def main(config_path):
 
     # save path
     os.makedirs('trained_model', exist_ok=True)
-    os.makedirs('trained_model/freq_schedule', exist_ok=True)
-    save_path = f'trained_model/freq_schedule/{model_name}'
+    os.makedirs('trained_model/freq_schedule2', exist_ok=True)
+    save_path = f'trained_model/freq_schedule2/{model_name}'
     os.makedirs(save_path, exist_ok=True)
 
     # copy config file

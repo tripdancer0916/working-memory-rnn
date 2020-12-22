@@ -44,7 +44,7 @@ def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25
 torch.manual_seed(1)
 device = torch.device('cpu')
 
-config_path = '../cfg/freq_config/20201204_4_5.cfg'
+config_path = '../cfg/freq_config/20201126_2_2.cfg'
 with open(config_path, 'r') as f:
     cfg = yaml.safe_load(f)
 
@@ -105,6 +105,7 @@ plt.plot(
     list(range(15, 500, 10)),
     mse_list,
 )
+plt.ylim([0, 1])
 plt.xlabel('timepoint', fontsize=16)
 plt.ylabel('MSE', fontsize=16)
 

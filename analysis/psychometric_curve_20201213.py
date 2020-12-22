@@ -11,27 +11,30 @@ sys.path.append('../')
 from model import RecurrentNeuralNetwork
 
 
-def romo_signal(delta, N, signal_length, sigma_in, time_length):
+def romo_signal(delta, N, signal_length, sigma_in, delay, time_length=60):
     signals = np.zeros([N, time_length + 1, 1])
+    first_signal_timing = 0
     freq_range = 4 - abs(delta)
+    second_signal_timing = -signal_length + delay + time_length
+    second_signal_length = signal_length - delay
     for i in range(N):
-        first_signal_timing = 0
-        second_signal_timing = time_length - signal_length
         first_signal_freq = np.random.rand() * freq_range + max(1, 1 - delta)
         second_signal_freq = first_signal_freq + delta
         t = np.arange(0, signal_length / 4, 0.25)
         phase_shift_1 = np.random.rand() * np.pi
         first_signal = np.sin(first_signal_freq * t + phase_shift_1) + np.random.normal(0, sigma_in, signal_length)
+        t = np.arange(0, second_signal_length / 4, 0.25)
         phase_shift_2 = np.random.rand() * np.pi
-        second_signal = np.sin(second_signal_freq * t + phase_shift_2) + np.random.normal(0, sigma_in, signal_length)
+        second_signal = np.sin(second_signal_freq * t + phase_shift_2) + \
+            np.random.normal(0, sigma_in, second_signal_length)
 
         signals[i, first_signal_timing: first_signal_timing + signal_length, 0] = first_signal
-        signals[i, second_signal_timing: second_signal_timing + signal_length, 0] = second_signal
+        signals[i, second_signal_timing: second_signal_timing + second_signal_length, 0] = second_signal
 
     return signals
 
 
-def main(config_path, sigma_in, signal_length, time_length, epoch):
+def main(config_path, sigma_in, signal_length, delay, epoch):
     # hyper-parameter
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
@@ -66,7 +69,7 @@ def main(config_path, sigma_in, signal_length, time_length, epoch):
     print('delta score')
     for delta in deltas:
         output_list = np.zeros(N)
-        input_signal = romo_signal(delta, N, signal_length, sigma_in, time_length)
+        input_signal = romo_signal(delta, N, signal_length, sigma_in, delay)
         input_signal_split = np.split(input_signal, 4)
         for i in range(4):
             hidden = torch.zeros(250, model.n_hid)
@@ -81,9 +84,9 @@ def main(config_path, sigma_in, signal_length, time_length, epoch):
             print(f'{delta:.3f}', np.mean(output_list))
         delta_index += 1
     if sigma_in == 0.05:
-        np.save(os.path.join(save_path, f'{model_name}_{time_length}_{epoch}.npy'), score)
+        np.save(os.path.join(save_path, f'{model_name}_{delay}_{epoch}_2.npy'), score)
     else:
-        np.save(os.path.join(save_path, f'{model_name}_{sigma_in}.npy'), score)
+        np.save(os.path.join(save_path, f'{model_name}_{sigma_in}_2.npy'), score)
 
 
 if __name__ == '__main__':
@@ -91,8 +94,8 @@ if __name__ == '__main__':
     parser.add_argument('config_path', type=str)
     parser.add_argument('--sigma_in', type=float, default=0.05)
     parser.add_argument('--signal_length', type=int, default=15)
-    parser.add_argument('--time_length', type=int, default=60)
+    parser.add_argument('--delay', type=int, default=0)
     parser.add_argument('--epoch', type=int, default=3000)
     args = parser.parse_args()
     print(args)
-    main(args.config_path, args.sigma_in, args.signal_length, args.time_length, args.epoch)
+    main(args.config_path, args.sigma_in, args.signal_length, args.delay, args.epoch)

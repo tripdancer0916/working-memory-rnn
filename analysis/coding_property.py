@@ -109,6 +109,7 @@ def main(config_path):
         diff_omega_list,
         angle_list,
     )
+    plt.ylim([0, 180])
     plt.xlabel(r'$|\omega_i - \omega_j|$', fontsize=16)
     plt.ylabel(r'$\theta$', fontsize=16)
 
@@ -131,6 +132,7 @@ def main(config_path):
         diff_omega_list,
         angle_list,
     )
+    plt.ylim([0, 180])
     plt.xlabel(r'$|\omega_i - \omega_j|$', fontsize=16)
     plt.ylabel(r'$\theta$', fontsize=16)
 

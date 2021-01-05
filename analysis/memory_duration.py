@@ -35,7 +35,8 @@ def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25
         signals[i, first_signal_timing + signal_length:, 0] = \
             np.random.normal(
                 0,
-                sigma_in,
+                # sigma_in,
+                0,
                 time_length + 1 - signal_length - first_signal_timing,
             )
 

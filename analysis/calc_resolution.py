@@ -4,7 +4,6 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import linalg as LA
 import torch
 import yaml
 

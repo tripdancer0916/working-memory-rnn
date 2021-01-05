@@ -99,7 +99,7 @@ def main(config_path):
         for j in range(i+1, 16):
             angle = tangent_angle(
                 np.mean(neural_dynamics[100 * i:100 * (i + 1), 15], axis=0),
-                np.mean(neural_dynamics[100 * (j + 1):100 * (j + 2), 15], axis=0),
+                np.mean(neural_dynamics[100 * j:100 * (j + 1), 15], axis=0),
             )
             angle_list.append(angle)
             diff_omega_list.append(abs(i-j) * 0.25)

@@ -6,9 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import yaml
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 
 sys.path.append('../')
 
@@ -31,14 +28,6 @@ def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25
 
         first_signal = np.sin(omega_1 * t + phase_shift_1) + np.random.normal(0, sigma_in, signal_length)
         signals[i, first_signal_timing: first_signal_timing + signal_length, 0] = first_signal
-
-        signals[i, first_signal_timing + signal_length:, 0] = \
-            np.random.normal(
-                0,
-                # sigma_in,
-                0,
-                time_length + 1 - signal_length - first_signal_timing,
-            )
 
     return signals, omega_1_list
 
@@ -65,7 +54,7 @@ def main(config_path):
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
-    trial_num = 3000
+    trial_num = 100
     neural_dynamics = np.zeros((trial_num, 1001, model.n_hid))
     outputs_np = np.zeros(trial_num)
     input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=1000)
@@ -82,24 +71,23 @@ def main(config_path):
             outputs.detach().numpy()[:, -1], axis=1)
         neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
-    train_data, test_data, train_target, test_target = train_test_split(neural_dynamics, omega_1_list, test_size=0.25)
+    norm_list = []
+    for i in range(300):
+        norm_list.append(np.linalg.norm(neural_dynamics[0, i + 500, :] - neural_dynamics[0, 500, :]))
 
-    clf_coef_norm = []
+    period_list = []
+    period = np.argmin(norm_list[1:])
 
-    os.makedirs('results', exist_ok=True)
-    os.makedirs(f'results/{model_name}', exist_ok=True)
+    for i in range(40, 500):
+        period_list.append(
+            np.mean(np.linalg.norm(neural_dynamics[:, i, :] - neural_dynamics[:, i + period + 1, :], axis=1)))
+    plt.figure(constrained_layout=True)
+    plt.plot(period_list)
+    plt.xlabel('time', fontsize=16)
+    plt.ylabel(r'$|x(t)-x(t+T_L)|$', fontsize=16)
+    plt.title(model_name, fontsize=16)
 
-    timepoint = 45
-    for alpha in [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 1.0]:
-        clf = Ridge(alpha=alpha)
-        clf.fit(train_data[:, timepoint, :], train_target)
-
-        clf_coef_norm.append(np.linalg.norm(clf.coef_))
-        mse = mean_squared_error(
-            clf.predict(test_data[:, timepoint, :]),
-            test_target,
-        )
-        print(alpha, mse)
+    plt.savefig(f'results/{model_name}/convergence.png', dpi=200)
 
 
 if __name__ == '__main__':

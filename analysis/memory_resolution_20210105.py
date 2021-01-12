@@ -86,7 +86,7 @@ def main(config_path):
     time_45_mse = 0
     os.makedirs('results', exist_ok=True)
     os.makedirs(f'results/{model_name}', exist_ok=True)
-    for trial in range(50):
+    for trial in range(300):
         train_data, test_data, train_target, test_target = train_test_split(neural_dynamics, omega_1_list, test_size=0.25)
 
         clf_coef_norm = []
@@ -111,7 +111,7 @@ def main(config_path):
             clf.predict(test_data[:, timepoint, :]),
             test_target,
         )
-        print(timepoint, mse)
+        # print(timepoint, mse)
         time_45_mse += mse
 
         timepoint = 15
@@ -123,7 +123,7 @@ def main(config_path):
             clf.predict(test_data[:, timepoint, :]),
             test_target,
         )
-        print(timepoint, mse)
+        # print(timepoint, mse)
         time_15_mse += mse
 
     print('average')

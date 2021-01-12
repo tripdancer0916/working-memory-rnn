@@ -19,7 +19,7 @@ from fixed_point_analyzer import FixedPoint
 from model import RecurrentNeuralNetwork
 
 
-def main(config_path):
+def main(config_path, model_epoch):
     # hyper-parameter
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
@@ -56,7 +56,7 @@ def main(config_path):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'trained_model/freq/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
+    model_path = f'../trained_model/freq/{model_name}/epoch_{model_epoch}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
@@ -113,6 +113,7 @@ def main(config_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch RNN fixed point analysis')
     parser.add_argument('config_path', type=str)
+    parser.add_argument('--model_epoch', type=int, default=3000)
     args = parser.parse_args()
     print(args)
-    main(args.config_path)
+    main(args.config_path, args.model_epoch)

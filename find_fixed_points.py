@@ -29,7 +29,7 @@ def main(config_path, model_epoch):
     # save path
     os.makedirs('fixed_points', exist_ok=True)
     os.makedirs('fixed_points/freq', exist_ok=True)
-    save_path = f'fixed_points/freq/{model_name}'
+    save_path = f'fixed_points/freq/{model_name}_{model_epoch}'
     os.makedirs(save_path, exist_ok=True)
 
     # copy config file
@@ -90,21 +90,21 @@ def main(config_path, model_epoch):
             hidden = hidden.detach()
             hidden_list, output, hidden, _ = model(inputs, hidden)
 
-            const_signal = torch.tensor([0] * 1)
-            const_signal = const_signal.float().to(device)
+            # const_signal = torch.tensor([0] * 1)
+            # const_signal = const_signal.float().to(device)
 
             reference_time_point = np.random.randint(35, 55)
             fixed_point, result_ok = analyzer.find_fixed_point(hidden_list[0, reference_time_point], view=True)
 
             fixed_point = fixed_point.detach().cpu().numpy()
 
-            print(fixed_point)
-            fixed_point_tensor = torch.from_numpy(fixed_point).float()
-            jacobian = analyzer.calc_jacobian(fixed_point_tensor, const_signal)
+            # print(fixed_point)
+            # fixed_point_tensor = torch.from_numpy(fixed_point).float()
+            # jacobian = analyzer.calc_jacobian(fixed_point_tensor, const_signal)
 
             # print(np.dot(model.w_out.weight.detach().cpu().numpy(), fixed_point))
 
-            w, v = np.linalg.eig(jacobian)
+            # w, v = np.linalg.eig(jacobian)
             # print('eigenvalues', w)
 
             np.savetxt(os.path.join(save_path, f'fixed_point_{trial}_{i}.txt'), fixed_point)

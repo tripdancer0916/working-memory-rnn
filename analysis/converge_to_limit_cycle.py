@@ -85,11 +85,18 @@ def main(config_path, model_epoch):
         period_list.append(
             np.mean(np.linalg.norm(neural_dynamics[:, i, :] - neural_dynamics[:, i + period + 1, :], axis=1)))
 
-    for i in range(len(period_list)):
-        # print(period_list[i])
-        if period_list[i] < 0.06:
-            print(i+40)
-            break
+    if np.min(period_list) > 0.05:
+        for i in range(len(period_list)):
+            # print(period_list[i])
+            if period_list[i] < np.min(period_list)*1.05:
+                print(i+40)
+                break
+    else:
+        for i in range(len(period_list)):
+            # print(period_list[i])
+            if period_list[i] < 0.05:
+                print(i+40)
+                break
     """
     plt.figure(constrained_layout=True)
     plt.plot(period_list)

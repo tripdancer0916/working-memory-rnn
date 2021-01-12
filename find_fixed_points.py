@@ -56,7 +56,7 @@ def main(config_path, model_epoch):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'../trained_model/freq/{model_name}/epoch_{model_epoch}.pth'
+    model_path = f'trained_model/freq/{model_name}/epoch_{model_epoch}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 

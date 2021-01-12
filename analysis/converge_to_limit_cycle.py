@@ -55,9 +55,9 @@ def main(config_path):
     model.eval()
 
     trial_num = 100
-    neural_dynamics = np.zeros((trial_num, 1001, model.n_hid))
+    neural_dynamics = np.zeros((trial_num, 2001, model.n_hid))
     outputs_np = np.zeros(trial_num)
-    input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=1000)
+    input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=2000)
     input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
     for i in range(trial_num // cfg['TRAIN']['BATCHSIZE']):
@@ -78,9 +78,19 @@ def main(config_path):
     period_list = []
     period = np.argmin(norm_list[1:])
 
-    for i in range(40, 500):
+    os.makedirs('results', exist_ok=True)
+    os.makedirs(f'results/{model_name}', exist_ok=True)
+
+    for i in range(40, 1500):
         period_list.append(
             np.mean(np.linalg.norm(neural_dynamics[:, i, :] - neural_dynamics[:, i + period + 1, :], axis=1)))
+
+    for i in range(len(period_list)):
+        # print(period_list[i])
+        if period_list[i] < 0.06:
+            print(i+40)
+            break
+    """
     plt.figure(constrained_layout=True)
     plt.plot(period_list)
     plt.xlabel('time', fontsize=16)
@@ -88,6 +98,7 @@ def main(config_path):
     plt.title(model_name, fontsize=16)
 
     plt.savefig(f'results/{model_name}/convergence.png', dpi=200)
+    """
 
 
 if __name__ == '__main__':

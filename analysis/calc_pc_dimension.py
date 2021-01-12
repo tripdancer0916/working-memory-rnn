@@ -6,9 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import yaml
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 
 sys.path.append('../')
 
@@ -22,7 +20,8 @@ sns.set_palette('Dark2')
 
 def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25):
     signals = np.zeros([batch_size, time_length + 1, 1])
-    omega_1_list = np.random.rand(batch_size) * 4 + 1
+    # omega_1_list = np.random.rand(batch_size) * 4 + 1
+    omega_1_list = np.linspace(1, 5, batch_size)
     for i in range(batch_size):
         phase_shift_1 = np.random.rand() * np.pi
         omega_1 = omega_1_list[i]
@@ -31,14 +30,6 @@ def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25
 
         first_signal = np.sin(omega_1 * t + phase_shift_1) + np.random.normal(0, sigma_in, signal_length)
         signals[i, first_signal_timing: first_signal_timing + signal_length, 0] = first_signal
-
-        signals[i, first_signal_timing + signal_length:, 0] = \
-            np.random.normal(
-                0,
-                # sigma_in,
-                0,
-                time_length + 1 - signal_length - first_signal_timing,
-            )
 
     return signals, omega_1_list
 
@@ -65,7 +56,7 @@ def main(config_path):
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
-    trial_num = 3000
+    trial_num = 1000
     neural_dynamics = np.zeros((trial_num, 1001, model.n_hid))
     outputs_np = np.zeros(trial_num)
     input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=1000)
@@ -82,53 +73,30 @@ def main(config_path):
             outputs.detach().numpy()[:, -1], axis=1)
         neural_dynamics[i * cfg['TRAIN']['BATCHSIZE']: (i + 1) * cfg['TRAIN']['BATCHSIZE']] = hidden_list_np
 
-    time_15_mse = 0
-    time_45_mse = 0
-    os.makedirs('results', exist_ok=True)
-    os.makedirs(f'results/{model_name}', exist_ok=True)
-    for trial in range(50):
-        train_data, test_data, train_target, test_target = train_test_split(neural_dynamics, omega_1_list, test_size=0.25)
+    covariance_matrix = np.zeros((256, 256))
+    for i in range(trial_num):
+        covariance_matrix += np.outer(neural_dynamics[i, 45], neural_dynamics[i, 45])
 
-        clf_coef_norm = []
-        timepoint = 45
-        """"
-        for alpha in [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 1.0]:
-            clf = Ridge(alpha=alpha)
-            clf.fit(train_data[:, timepoint, :], train_target)
-        
-            clf_coef_norm.append(np.linalg.norm(clf.coef_))
-            mse = mean_squared_error(
-                clf.predict(test_data[:, timepoint, :]),
-                test_target,
-            )
-            print(alpha, mse)
-         """
-        clf = Ridge(alpha=0.00001)
-        clf.fit(train_data[:, timepoint, :], train_target)
+    covariance_matrix = covariance_matrix / trial_num
+    w, v = np.linalg.eig(covariance_matrix)
 
-        clf_coef_norm.append(np.linalg.norm(clf.coef_))
-        mse = mean_squared_error(
-            clf.predict(test_data[:, timepoint, :]),
-            test_target,
-        )
-        print(timepoint, mse)
-        time_45_mse += mse
+    lin_d = np.sum(w.real) ** 2 / np.sum(w.real ** 2)
 
-        timepoint = 15
-        clf = Ridge(alpha=0.00001)
-        clf.fit(train_data[:, timepoint, :], train_target)
+    pca = PCA()
+    pca.fit(neural_dynamics[:, 45, :])
 
-        clf_coef_norm.append(np.linalg.norm(clf.coef_))
-        mse = mean_squared_error(
-            clf.predict(test_data[:, timepoint, :]),
-            test_target,
-        )
-        print(timepoint, mse)
-        time_15_mse += mse
+    pc_lin_dim = np.sum(pca.explained_variance_) ** 2 / np.sum(pca.explained_variance_ ** 2)
 
-    print('average')
-    print(f'time: 15, mse: {time_15_mse/50}')
-    print(f'time: 45, mse: {time_45_mse/50}')
+    print(lin_d, pc_lin_dim)
+
+    lin_dim = 0
+    for i in range(trial_num):
+        pca = PCA()
+        pca.fit(neural_dynamics[i, 25:50, :])
+
+        lin_dim += np.sum(pca.explained_variance_) ** 2 / np.sum(pca.explained_variance_ ** 2)
+        # print(lin_dim)
+    print(lin_dim / trial_num)
 
 
 if __name__ == '__main__':

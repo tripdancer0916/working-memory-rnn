@@ -86,8 +86,11 @@ def main(config_path):
     for timepoint in range(15, 45):
         active_norm = np.mean(np.linalg.norm(neural_dynamics[:, timepoint, :], axis=1))
         norm_list.append(active_norm)
-        print(timepoint, active_norm)
+        # print(timepoint, active_norm)
 
+    print(np.min(norm_list))
+
+    """
     plt.figure(constrained_layout=True)
     plt.plot(
         list(range(15, 45)),
@@ -98,6 +101,7 @@ def main(config_path):
 
     plt.savefig(f'results/{model_name}/active_norm.png', dpi=200)
     np.save(f'results/{model_name}/active_norm.npy', np.array(norm_list))
+    """
 
 
 if __name__ == '__main__':

@@ -127,8 +127,8 @@ def main(config_path):
         time_15_mse += mse
 
     print('average')
-    print(f'time: 15, mse: {time_15_mse/50}')
-    print(f'time: 45, mse: {time_45_mse/50}')
+    print(f'time: 15, mse: {time_15_mse/300}')
+    print(f'time: 45, mse: {time_45_mse/300}')
 
 
 if __name__ == '__main__':

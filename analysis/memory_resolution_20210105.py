@@ -65,10 +65,10 @@ def main(config_path):
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
-    trial_num = 3000
-    neural_dynamics = np.zeros((trial_num, 1001, model.n_hid))
+    trial_num = 1000
+    neural_dynamics = np.zeros((trial_num, 61, model.n_hid))
     outputs_np = np.zeros(trial_num)
-    input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=1000)
+    input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=60)
     input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
     for i in range(trial_num // cfg['TRAIN']['BATCHSIZE']):

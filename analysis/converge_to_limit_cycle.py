@@ -32,7 +32,7 @@ def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25
     return signals, omega_1_list
 
 
-def main(config_path):
+def main(config_path, model_epoch):
     torch.manual_seed(1)
     device = torch.device('cpu')
 
@@ -50,7 +50,7 @@ def main(config_path):
                                    sigma_syn=cfg['MODEL']['SIGMA_SYN'],
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
-    model_path = f'../trained_model/freq/{model_name}/epoch_3000.pth'
+    model_path = f'../trained_model/freq/{model_name}/epoch_{model_epoch}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
@@ -104,6 +104,7 @@ def main(config_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch RNN training')
     parser.add_argument('config_path', type=str)
+    parser.add_argument('--model_epoch', type=int, default=3000)
     args = parser.parse_args()
     print(args)
-    main(args.config_path)
+    main(args.config_path, args.model_epoch)

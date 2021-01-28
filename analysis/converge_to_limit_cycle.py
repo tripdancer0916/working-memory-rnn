@@ -85,11 +85,12 @@ def main(config_path, model_epoch):
         period_list.append(
             np.mean(np.linalg.norm(neural_dynamics[:, i, :] - neural_dynamics[:, i + period + 1, :], axis=1)))
 
+    print(np.min(period_list))
     if np.min(period_list) > 0.05:
         for i in range(len(period_list)):
             # print(period_list[i])
             if period_list[i] < np.min(period_list)*1.05:
-                print(i+40)
+                print(i+40, '!')
                 break
     else:
         for i in range(len(period_list)):
@@ -97,7 +98,7 @@ def main(config_path, model_epoch):
             if period_list[i] < 0.05:
                 print(i+40)
                 break
-    """
+
     plt.figure(constrained_layout=True)
     plt.plot(period_list)
     plt.xlabel('time', fontsize=16)
@@ -105,7 +106,6 @@ def main(config_path, model_epoch):
     plt.title(model_name, fontsize=16)
 
     plt.savefig(f'results/{model_name}/convergence.png', dpi=200)
-    """
 
 
 if __name__ == '__main__':

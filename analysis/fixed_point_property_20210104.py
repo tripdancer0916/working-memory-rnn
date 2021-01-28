@@ -56,7 +56,7 @@ def calc_speed(hidden_activated, model):
     return speed.item()
 
 
-def main(config_path):
+def main(config_path, model_epoch):
     torch.manual_seed(1)
     device = torch.device('cpu')
 
@@ -74,7 +74,7 @@ def main(config_path):
                                    sigma_syn=cfg['MODEL']['SIGMA_SYN'],
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
-    model_path = f'../trained_model/freq/{model_name}/epoch_3000.pth'
+    model_path = f'../trained_model/freq/{model_name}/epoch_{model_epoch}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
@@ -82,11 +82,11 @@ def main(config_path):
     count = 0
     for i in range(50):
         for j in range(4):
-            fixed_point_list[count] = np.loadtxt(f'../fixed_points/freq/{model_name}/fixed_point_{i}_{j}.txt')
+            fixed_point_list[count] = np.loadtxt(f'../fixed_points/freq/{model_name}_{model_epoch}/fixed_point_{i}_{j}.txt')
             count += 1
 
     speed_list = []
-    for i in range(200):
+    for i in range(len(fixed_point_list)):
         speed_list.append(calc_speed(torch.from_numpy(fixed_point_list[i]).float(), model))
 
     print('average speed: ', np.mean(speed_list))
@@ -111,30 +111,50 @@ def main(config_path):
         pc_fixed_point_list[:, 2]
     )
 
-    plt.savefig(f'results/{model_name}/fixed_points.png', dpi=300)
+    os.makedirs(f'results/{model_name}_{model_epoch}', exist_ok=True)
+    plt.savefig(f'results/{model_name}_{model_epoch}/fixed_points.png', dpi=300)
 
     fixed_point_list = []
+    speed_list = []
     for i in range(50):
         for j in range(4):
-            fixed_point = np.loadtxt(f'../fixed_points/freq/{model_name}/fixed_point_{i}_{j}.txt')
+            fixed_point = np.loadtxt(f'../fixed_points/freq/{model_name}_{model_epoch}/fixed_point_{i}_{j}.txt')
             if calc_speed(torch.from_numpy(fixed_point).float(), model) < 0.02:
+                speed_list.append(calc_speed(torch.from_numpy(fixed_point).float(), model))
                 fixed_point_list.append(fixed_point)
             # count += 1
-
+    # print(len(speed_list))
+    # print(len(fixed_point_list))
+    # print(np.argmin(speed_list))
     pc_fixed_point_list = pca.transform(fixed_point_list)
-    plt.figure(constrained_layout=True)
-    plt.scatter(
+    fig = plt.figure(figsize=(7, 6))
+    ax = Axes3D(fig)
+    ax.view_init(elev=25, azim=20)
+
+    # 軸ラベルの設定
+    ax.set_xlabel('PC1', fontsize=14)
+    ax.set_ylabel('PC2', fontsize=14)
+    ax.set_zlabel('PC3', fontsize=14)
+
+    ax.scatter(
         pc_fixed_point_list[:, 0],
         pc_fixed_point_list[:, 1],
-        s=5,
+        pc_fixed_point_list[:, 2],
     )
-    plt.xlabel('PC1', fontsize=16)
-    plt.ylabel('PC2', fontsize=16)
+
+    ax.scatter(
+        pc_fixed_point_list[np.argmin(speed_list), 0],
+        pc_fixed_point_list[np.argmin(speed_list), 1],
+        pc_fixed_point_list[np.argmin(speed_list), 2],
+        s=50,
+        color='red',
+    )
+
     plt.title(r'Only speed $\leq 0.02$', fontsize=14)
 
-    plt.savefig(f'results/{model_name}/fixed_points_2dim.png', dpi=300)
+    plt.savefig(f'results/{model_name}_{model_epoch}/fixed_points_slow_dim.png', dpi=300)
 
-    jacobian = calc_jacobian(torch.from_numpy(fixed_point_list[0]).float(), model)
+    jacobian = calc_jacobian(torch.from_numpy(fixed_point_list[np.argmin(speed_list)]).float(), model)
     w, v = np.linalg.eig(jacobian)
     plt.figure(constrained_layout=True)
     plt.scatter(
@@ -142,13 +162,26 @@ def main(config_path):
         w.imag,
     )
     plt.title(f'Eigenvalue Distribution, {np.max(w.real)}', fontsize=16)
-    plt.savefig(f'results/{model_name}/fixed_point_eig.png', dpi=300)
+    plt.savefig(f'results/{model_name}_{model_epoch}/fixed_point_eig.png', dpi=300)
+    print(w[w.real > 0])
+
+    plt.figure(constrained_layout=True)
+    plt.scatter(
+        w.real,
+        w.imag,
+    )
+    plt.xlim([-2, 0])
+    plt.ylim([-1, 1])
+    plt.title(f'Eigenvalue Distribution, {np.max(w.real)}', fontsize=16)
+    plt.savefig(f'results/{model_name}_{model_epoch}/fixed_point_eig2.png', dpi=300)
     print(w[w.real > 0])
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch RNN training')
     parser.add_argument('config_path', type=str)
+    parser.add_argument('--model_epoch', type=int, default=3000)
     args = parser.parse_args()
     print(args)
-    main(args.config_path)
+    main(args.config_path, args.model_epoch)
+

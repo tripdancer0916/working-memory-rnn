@@ -23,6 +23,7 @@ sns.set_palette('Dark2')
 def romo_signal(batch_size, signal_length, sigma_in, time_length=400, alpha=0.25):
     signals = np.zeros([batch_size, time_length + 1, 1])
     omega_1_list = np.random.rand(batch_size) * 4 + 1
+    # phase_shift_1 = np.random.rand() * np.pi
     for i in range(batch_size):
         phase_shift_1 = np.random.rand() * np.pi
         omega_1 = omega_1_list[i]
@@ -65,7 +66,7 @@ def main(config_path, model_epoch):
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
-    trial_num = 3000
+    trial_num = 1000
     neural_dynamics = np.zeros((trial_num, 61, model.n_hid))
     outputs_np = np.zeros(trial_num)
     input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=60)
@@ -86,10 +87,10 @@ def main(config_path, model_epoch):
     time_45_mse = 0
     os.makedirs('results', exist_ok=True)
     os.makedirs(f'results/{model_name}', exist_ok=True)
-    for trial in range(300):
+    clf_coef_norm_45 = []
+    clf_coef_norm_15 = []
+    for trial in range(100):
         train_data, test_data, train_target, test_target = train_test_split(neural_dynamics, omega_1_list, test_size=0.25)
-
-        clf_coef_norm = []
         timepoint = 45
         """"
         for alpha in [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5, 1.0]:
@@ -103,32 +104,35 @@ def main(config_path, model_epoch):
             )
             print(alpha, mse)
          """
-        clf = Ridge(alpha=0.00001)
-        clf.fit(train_data[:, timepoint, :], train_target)
+        clf = Ridge(alpha=0.01)
+        clf.fit(train_data[:, timepoint, :]**2, train_target)
+        # print(clf.coef_)
 
-        clf_coef_norm.append(np.linalg.norm(clf.coef_))
+        clf_coef_norm_45.append(np.linalg.norm(clf.coef_))
         mse = mean_squared_error(
-            clf.predict(test_data[:, timepoint, :]),
+            clf.predict(test_data[:, timepoint, :]**2),
             test_target,
         )
+        # print(clf.score(test_data[:, timepoint, :], test_target))
         # print(timepoint, mse)
         time_45_mse += mse
 
         timepoint = 15
-        clf = Ridge(alpha=0.00001)
-        clf.fit(train_data[:, timepoint, :], train_target)
+        clf = Ridge(alpha=0.01)
+        clf.fit(train_data[:, timepoint, :]**2, train_target)
+        # print(clf.score(test_data[:, timepoint, :], test_target))
 
-        clf_coef_norm.append(np.linalg.norm(clf.coef_))
+        clf_coef_norm_15.append(np.linalg.norm(clf.coef_))
         mse = mean_squared_error(
-            clf.predict(test_data[:, timepoint, :]),
+            clf.predict(test_data[:, timepoint, :]**2),
             test_target,
         )
         # print(timepoint, mse)
         time_15_mse += mse
 
     print('average')
-    print(f'time: 15, mse: {time_15_mse/300}')
-    print(f'time: 45, mse: {time_45_mse/300}')
+    print(f'time: 15, mse: {time_15_mse/100}, {np.mean(clf_coef_norm_15)}')
+    print(f'time: 45, mse: {time_45_mse/100}, {np.mean(clf_coef_norm_45)}')
 
 
 if __name__ == '__main__':

@@ -134,7 +134,7 @@ def main(config_path):
     correct = 0
     num_data = 0
     base_delay_period = cfg['DATALOADER']['TIME_LENGTH'] - 2*cfg['DATALOADER']['SIGNAL_LENGTH']
-    vs = cfg['DATALOADER']['VARIABLE_SIGNAL_LENGTH']
+    vs = cfg['DATALOADER']['VARIABLE_DELAY']
     batch_size = 50
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()

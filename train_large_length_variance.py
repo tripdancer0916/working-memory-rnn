@@ -150,6 +150,9 @@ def main(config_path):
                 inputs[j] = signal
                 targets[j] = target
 
+            print(inputs.shape)
+            print(targets.shape)
+
             inputs = torch.from_numpy(inputs)
             targets = torch.from_numpy(targets)
             inputs, targets = inputs.float(), targets.long()

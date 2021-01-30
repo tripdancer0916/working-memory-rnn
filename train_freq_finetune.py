@@ -81,6 +81,9 @@ def main(config_path):
             inputs, target = inputs.float(), target.long()
             inputs, target = Variable(inputs).to(device), Variable(target).to(device)
 
+            print(inputs.shape)
+            print(target.shape)
+
             hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], cfg['MODEL']['SIZE'])
             hidden = hidden.to(device)
 

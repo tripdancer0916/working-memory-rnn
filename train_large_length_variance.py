@@ -144,14 +144,11 @@ def main(config_path):
             delay_period = np.random.randint(base_delay_period - vs, base_delay_period + vs + 1)
             time_length = cfg['DATALOADER']['SIGNAL_LENGTH'] * 2 + delay_period
             inputs = np.zeros([batch_size, time_length+1, 1])
-            targets = np.zeros([batch_size, 1])
+            targets = np.zeros(batch_size)
             for j in range(batch_size):
                 signal, target = train_dataset.getitem(delay_period)
                 inputs[j] = signal
                 targets[j] = target
-
-            print(inputs.shape)
-            print(targets.shape)
 
             inputs = torch.from_numpy(inputs)
             targets = torch.from_numpy(targets)

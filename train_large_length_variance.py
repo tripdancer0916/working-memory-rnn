@@ -79,6 +79,8 @@ class FreqDataset(data.Dataset):
         else:
             target = np.array(1)
 
+        signal = np.expand_dims(signal, axis=1)
+
         return signal, target
 
 

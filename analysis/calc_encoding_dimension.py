@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 import warnings
 
 import numpy as np
@@ -8,6 +9,8 @@ import yaml
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
+
+sys.path.append('../')
 
 from model import RecurrentNeuralNetwork
 

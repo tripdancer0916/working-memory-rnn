@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 import warnings
 
 import numpy as np
@@ -8,6 +9,8 @@ import yaml
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
+
+sys.path.append('../')
 
 from model import RecurrentNeuralNetwork
 
@@ -40,7 +43,8 @@ def main(config_path, sigma_in, signal_length):
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
     os.makedirs('results/', exist_ok=True)
-    save_path = f'results/encoding_dimension_time_series/'
+    os.makedirs(f'results/{model_name}', exist_ok=True)
+    save_path = f'results/{model_name}/encoding_dimension_time_series/'
     os.makedirs(save_path, exist_ok=True)
 
     # モデルのロード
@@ -55,16 +59,17 @@ def main(config_path, sigma_in, signal_length):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'trained_model/romo/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
+    model_path = f'../trained_model/freq/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.eval()
 
     correct_ratio = np.zeros(11)
-    division_num = 20
+    acc_list = np.zeros([11, 300])
+    division_num = 16
     time_sample = np.linspace(15, 45, division_num)
     omega_idx = 0
-    for omega_1 in [3, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]:
+    for omega_1 in [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]:
         sample_num = 2000
         neural_dynamics = np.zeros((sample_num, 61, model.n_hid))
         input_signal, omega_2_list = romo_signal_fixed_omega_1(omega_1, sample_num,
@@ -123,10 +128,13 @@ def main(config_path, sigma_in, signal_length):
             if accuracy_test > 0.85:
                 correct += 1
 
+            acc_list[omega_idx, i] = accuracy_test
+
         correct_ratio[omega_idx] = correct / 300
         omega_idx += 1
 
-    np.save(os.path.join(save_path, f'{model_name}.npy'), correct_ratio)
+    np.save(os.path.join(save_path, f'correct_ratio.npy'), correct_ratio)
+    np.save(os.path.join(save_path, 'acc_list.npy'), acc_list)
 
 
 if __name__ == '__main__':

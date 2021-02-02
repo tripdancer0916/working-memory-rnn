@@ -42,7 +42,8 @@ def main(config_path, sigma_in, signal_length):
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
     os.makedirs('results/', exist_ok=True)
-    save_path = f'results/encoding_dimension/'
+    os.makedirs(f'results/{model_name}', exist_ok=True)
+    save_path = f'results/{model_name}/encoding_dimension/'
     os.makedirs(save_path, exist_ok=True)
 
     # モデルのロード
@@ -57,7 +58,7 @@ def main(config_path, sigma_in, signal_length):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'trained_model/romo/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
+    model_path = f'../trained_model/freq/{model_name}/epoch_{cfg["TRAIN"]["NUM_EPOCH"]}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.eval()
@@ -81,10 +82,11 @@ def main(config_path, sigma_in, signal_length):
     sample_y = np.zeros(sample_num)
 
     for i in range(sample_num):
-        sample_X[i: (i + 1), :] = neural_dynamics[i, 15, :]
+        sample_X[i: (i + 1), :] = neural_dynamics[i, 45, :]
         sample_y[i] = omega_1_list[i]
 
     correct = 0
+    acc_list = np.zeros(300)
     for i in range(300):
         binary_def = np.random.choice([0, 1], 11)
         omega_1_sample = [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8, 4.2, 4.6, 5]
@@ -113,8 +115,10 @@ def main(config_path, sigma_in, signal_length):
         # print('テストデータに対する正解率： %.2f' % accuracy_test)
         if accuracy_test > 0.85:
             correct += 1
+        acc_list[i] = accuracy_test
 
-    np.save(os.path.join(save_path, f'{model_name}.npy'), np.array(correct / 300))
+    np.save(os.path.join(save_path, f'correct_ratio.npy'), np.array(correct / 300))
+    np.save(os.path.join(save_path, f'acc_list.npy'), acc_list)
 
 
 if __name__ == '__main__':

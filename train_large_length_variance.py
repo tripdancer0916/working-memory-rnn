@@ -115,8 +115,8 @@ def main(config_path):
                                    sigma_syn=cfg['MODEL']['SIGMA_SYN'],
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
-    model_path = f'trained_model/freq/20210130_2_1/epoch_2400.pth'
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    # model_path = f'trained_model/freq/20210130_2_1/epoch_2400.pth'
+    # model.load_state_dict(torch.load(model_path, map_location=device))
 
     train_dataset = FreqDataset(time_length=cfg['DATALOADER']['TIME_LENGTH'],
                                 time_scale=cfg['MODEL']['ALPHA'],

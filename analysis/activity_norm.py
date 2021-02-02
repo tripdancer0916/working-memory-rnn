@@ -64,7 +64,7 @@ def main(config_path, model_epoch):
     trial_num = 3000
     neural_dynamics = np.zeros((trial_num, 101, model.n_hid))
     outputs_np = np.zeros(trial_num)
-    input_signal, omega_1_list = romo_signal(trial_num, signal_length=25, sigma_in=0.05, time_length=100)
+    input_signal, omega_1_list = romo_signal(trial_num, signal_length=15, sigma_in=0.05, time_length=100)
     input_signal_split = np.split(input_signal, trial_num // cfg['TRAIN']['BATCHSIZE'])
 
     for i in range(trial_num // cfg['TRAIN']['BATCHSIZE']):
@@ -83,7 +83,7 @@ def main(config_path, model_epoch):
 
     norm_list = []
 
-    for timepoint in range(25, 65):
+    for timepoint in range(15, 45):
         active_norm = np.mean(np.linalg.norm(neural_dynamics[:, timepoint, :], axis=1))
         norm_list.append(active_norm)
         # print(timepoint, active_norm)
@@ -92,7 +92,7 @@ def main(config_path, model_epoch):
 
     plt.figure(constrained_layout=True)
     plt.plot(
-        list(range(25, 65)),
+        list(range(15, 45)),
         norm_list,
     )
     plt.xlabel('timepoint', fontsize=16)

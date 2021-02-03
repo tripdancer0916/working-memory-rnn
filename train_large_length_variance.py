@@ -56,8 +56,10 @@ class FreqDataset(data.Dataset):
                 break
 
         # first signal
-        t = np.arange(0, self.signal_length * self.time_scale, self.time_scale)
-        if len(t) != self.signal_length:
+        vs = np.random.randint(-self.variable_signal_length, self.variable_signal_length + 1)
+        first_signal_length = self.signal_length + vs
+        t = np.arange(0, first_signal_length * self.time_scale, self.time_scale)
+        if len(t) != first_signal_length:
             t = t[:-1]
         phase_shift = np.random.rand() * np.pi
         first_signal = np.sin(first_signal_freq * t + phase_shift) + \
@@ -93,8 +95,8 @@ def main(config_path):
 
     # save path
     os.makedirs('trained_model', exist_ok=True)
-    os.makedirs('trained_model/freq', exist_ok=True)
-    save_path = f'trained_model/freq/{model_name}'
+    os.makedirs('trained_model/freq_20210203', exist_ok=True)
+    save_path = f'trained_model/freq_20210203/{model_name}'
     os.makedirs(save_path, exist_ok=True)
 
     # copy config file

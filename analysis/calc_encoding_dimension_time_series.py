@@ -68,8 +68,9 @@ def main(config_path, sigma_in, signal_length, model_epoch):
 
     correct_ratio = np.zeros(6)
     acc_list = np.zeros([6, 200])
-    division_num = 21
-    time_sample = np.linspace(25, 45, division_num)
+    division_num = 7
+    # time_sample = np.linspace(25, 45, division_num)
+    time_sample = [42, 43, 44, 45, 46, 47, 48]
     omega_idx = 0
     for omega_1 in [1, 1.8, 2.6, 3.4, 4.2, 5]:
         sample_num = 100
@@ -109,7 +110,13 @@ def main(config_path, sigma_in, signal_length, model_epoch):
 
         correct = 0
         for i in range(200):
-            binary_def = np.random.choice([0, 1], division_num)
+            while True:
+                binary_def = np.random.choice([0, 1], division_num)
+                # print(binary_def)
+                if binary_def.tolist().count(1) > 1 and binary_def.tolist().count(0) > 1:
+                    # print(len([binary_def[j] == 0 for j in range(division_num)]))
+                    # print(len([binary_def[j] == 1 for j in range(division_num)]))
+                    break
             binary_dict = {}
             for j in range(division_num):
                 binary_dict[time_sample[j]] = binary_def[j]

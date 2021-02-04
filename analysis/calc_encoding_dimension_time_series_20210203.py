@@ -44,9 +44,9 @@ def main(config_path, sigma_in, signal_length, model_epoch):
 
     model_name = os.path.splitext(os.path.basename(config_path))[0]
 
-    os.makedirs('results/', exist_ok=True)
-    os.makedirs(f'results/{model_name}', exist_ok=True)
-    save_path = f'results/{model_name}/encoding_dimension_time_series/'
+    os.makedirs('results_20210203/', exist_ok=True)
+    os.makedirs(f'results_20210203/{model_name}', exist_ok=True)
+    save_path = f'results_20210203/{model_name}/encoding_dimension_time_series/'
     os.makedirs(save_path, exist_ok=True)
 
     # モデルのロード
@@ -61,7 +61,7 @@ def main(config_path, sigma_in, signal_length, model_epoch):
                                    use_bias=cfg['MODEL']['USE_BIAS'],
                                    anti_hebbian=cfg['MODEL']['ANTI_HEBB']).to(device)
 
-    model_path = f'../trained_model/freq/{model_name}/epoch_{model_epoch}.pth'
+    model_path = f'../trained_model/freq_20210203/{model_name}/epoch_{model_epoch}.pth'
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.eval()
@@ -70,8 +70,7 @@ def main(config_path, sigma_in, signal_length, model_epoch):
     acc_list = np.zeros([6, 200])
     division_num = 7
     # time_sample = np.linspace(25, 45, division_num)
-    # time_sample = [42, 43, 44, 45, 46, 47, 48]
-    time_sample = [25, 26, 27, 28, 29, 30, 31]
+    time_sample = [42, 43, 44, 45, 46, 47, 48]
     omega_idx = 0
     for omega_1 in [1, 1.8, 2.6, 3.4, 4.2, 5]:
         sample_num = 100
@@ -141,7 +140,7 @@ def main(config_path, sigma_in, signal_length, model_epoch):
             pred_train = linear_svc.predict(sample_X)
             accuracy_train = accuracy_score(label, pred_train)
 
-            # print(f'omega_1: {omega_1}, train acc: {accuracy_train:.2f}')
+            print(f'omega_1: {omega_1}, train acc: {accuracy_train:.2f}')
 
             # テストデータに対する精度
             # pred_test = linear_svc.predict(test_X)
@@ -157,8 +156,6 @@ def main(config_path, sigma_in, signal_length, model_epoch):
 
     np.save(os.path.join(save_path, f'correct_ratio.npy'), correct_ratio)
     np.save(os.path.join(save_path, 'acc_list.npy'), acc_list)
-
-    print(np.mean(acc_list))
 
 
 if __name__ == '__main__':

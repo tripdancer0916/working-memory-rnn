@@ -31,8 +31,8 @@ class RecurrentNeuralNetwork(nn.Module):
         self.abs_w_0 = torch.from_numpy(np.abs(self.w_0)).float()
         self.abs_w_0.requires_grad = True
         is_con_0 = np.zeros((n_hid, n_hid))
-        ind_in = np.random.choice(np.arange(n_hid), size=6553)
-        ind_out = np.random.choice(np.arange(n_hid), size=6553)
+        ind_in = np.random.choice(np.arange(n_hid), size=13000)
+        ind_out = np.random.choice(np.arange(n_hid), size=13000)
         is_con_0[ind_in, ind_out] = 1
 
         # Generate random signs
@@ -144,7 +144,7 @@ def main(config_path):
 
     correct = 0
     num_data = 0
-    num_connection = 6553
+    num_connection = 13000
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()
         for i, data in enumerate(train_dataloader):

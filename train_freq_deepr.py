@@ -172,11 +172,12 @@ def main(config_path):
             # print('!!!', model.theta.data[:10, :10])
             # print(model.abs_w_0.grad.data[:10, :10])
             # print(model.w_0.grad.data)
-            # print(model.tensor_is_con_0[:10, :10])
+            # print(model.tensor_is_con_0[:10, :10]
             for j, param in enumerate(model.parameters()):
                 param.data -= cfg['TRAIN']['LR'] * param.grad.data
             model.abs_w_0.data = model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data + \
-                torch.randn_like(model.abs_w_0) * 0.001 - cfg['TRAIN']['LR'] * model.abs_w_0.data * 0.05
+                torch.randn_like(model.abs_w_0) * (cfg['TRAIN']['LR'] * 0.1) - \
+                cfg['TRAIN']['LR'] * model.abs_w_0.data * (cfg['TRAIN']['LR'] * 5)
             # model.abs_w_0.data = torch.zeros((256, 256))
             # print(model.abs_w_0.data == model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data)
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),
@@ -205,6 +206,10 @@ def main(config_path):
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
             print(active_norm)
+            if active_norm.item() > 0.05:
+                cfg['TRAIN']['LR'] *= 0.1
+            if active_norm.item() > 0.1:
+                cfg['TRAIN']['LR'] *= 0.1
             correct = 0
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:

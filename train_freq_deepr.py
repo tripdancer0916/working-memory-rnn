@@ -213,6 +213,7 @@ def main(config_path):
                 flag1 = False
             if active_norm.item() > 0.1 and flag2:
                 cfg['TRAIN']['LR'] *= 0.1
+                cfg['TRAIN']['ACTIVATION_LAMBDA'] *= 5
                 flag2 = False
             correct = 0
             num_data = 0

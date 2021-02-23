@@ -63,7 +63,7 @@ class RecurrentNeuralNetwork(nn.Module):
             self.tensor_is_con_0 > 0,
             self.w_sign * self.theta,
             torch.zeros((self.n_hid, self.n_hid)).float(),
-        )
+        ).to(device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
         num_batch = input_signal.size(0)
         length = input_signal.size(1)
         hidden_list = torch.zeros(length, num_batch, self.n_hid).type_as(input_signal.data)

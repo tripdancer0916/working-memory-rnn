@@ -185,7 +185,6 @@ def main(config_path):
             num_reconnect = num_connection - np.count_nonzero(model.theta.detach().cpu().numpy() > 0)
             # print(np.count_nonzero(model.theta.detach().cpu().numpy() > 0))
             # print(num_reconnect)
-            print(model.w_hh.data[:10, :10])
             if num_reconnect > 0:
                 # below_zero_index = model.theta.detach().cpu().numpy() < 0
                 nonzero_index = model.theta.detach().cpu().numpy() > 0
@@ -202,6 +201,7 @@ def main(config_path):
                     model.abs_w_0.data[candidate_connection[j]] = 0.00001
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
+            print(model.w_hh.data[:10, :10])
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
             print(active_norm)

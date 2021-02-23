@@ -67,8 +67,8 @@ def main(config_path):
     print(model)
     print('Epoch Loss Acc')
 
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),
-                           lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
+    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),
+                          lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
     correct = 0
     num_data = 0
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):

@@ -71,7 +71,8 @@ def main(config_path, sigma_in, signal_length, model_epoch):
     division_num = 7
     # time_sample = np.linspace(25, 45, division_num)
     # time_sample = [42, 43, 44, 45, 46, 47, 48]
-    time_sample = [25, 26, 27, 28, 29, 30, 31]
+    # time_sample = [25, 26, 27, 28, 29, 30, 31]
+    time_sample = [32, 33, 34, 35, 36, 37, 38]
     omega_idx = 0
     for omega_1 in [1, 1.8, 2.6, 3.4, 4.2, 5]:
         sample_num = 100

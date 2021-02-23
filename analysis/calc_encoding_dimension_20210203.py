@@ -70,7 +70,7 @@ def main(config_path, sigma_in, signal_length, time_point, model_epoch):
 
     model.eval()
 
-    sample_num = 5000
+    sample_num = 2000
     neural_dynamics = np.zeros((sample_num, 201, model.n_hid))
     input_signal, omega_1_list, omega_2_list = romo_signal(sample_num, signal_length=signal_length, sigma_in=sigma_in)
     input_signal_split = np.split(input_signal, sample_num // cfg['TRAIN']['BATCHSIZE'])

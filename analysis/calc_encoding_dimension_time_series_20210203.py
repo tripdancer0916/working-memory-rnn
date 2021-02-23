@@ -71,6 +71,7 @@ def main(config_path, sigma_in, signal_length, model_epoch):
     division_num = 7
     # time_sample = np.linspace(25, 45, division_num)
     time_sample = [42, 43, 44, 45, 46, 47, 48]
+    # time_sample = [25, 26, 27, 28, 29, 30, 31]
     omega_idx = 0
     for omega_1 in [1, 1.8, 2.6, 3.4, 4.2, 5]:
         sample_num = 100
@@ -140,7 +141,7 @@ def main(config_path, sigma_in, signal_length, model_epoch):
             pred_train = linear_svc.predict(sample_X)
             accuracy_train = accuracy_score(label, pred_train)
 
-            print(f'omega_1: {omega_1}, train acc: {accuracy_train:.2f}')
+            # print(f'omega_1: {omega_1}, train acc: {accuracy_train:.2f}')
 
             # テストデータに対する精度
             # pred_test = linear_svc.predict(test_X)
@@ -156,6 +157,8 @@ def main(config_path, sigma_in, signal_length, model_epoch):
 
     np.save(os.path.join(save_path, f'correct_ratio.npy'), correct_ratio)
     np.save(os.path.join(save_path, 'acc_list.npy'), acc_list)
+
+    print(np.mean(acc_list))
 
 
 if __name__ == '__main__':

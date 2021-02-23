@@ -188,7 +188,7 @@ def main(config_path):
                 nonzero_index = model.theta.detach().cpu().numpy() > 0
                 # print(zero_index[:10, :10])
                 # print(model.tensor_is_con_0[:10, :10])
-                model.tensor_is_con_0 *= torch.from_numpy(nonzero_index.astype(np.int))
+                model.tensor_is_con_0 *= torch.from_numpy(nonzero_index.astype(np.int)).float()
                 # print(np.count_nonzero(zero_index))
                 print(np.count_nonzero(model.tensor_is_con_0.detach().cpu().numpy()))
                 candidate_connection = list(zip(*np.where(model.theta.detach().cpu().numpy() <= 0)))

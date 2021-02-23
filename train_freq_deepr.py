@@ -145,6 +145,8 @@ def main(config_path):
     correct = 0
     num_data = 0
     num_connection = 13000
+    flag1 = True
+    flag2 = True
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()
         for i, data in enumerate(train_dataloader):
@@ -206,10 +208,12 @@ def main(config_path):
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
             print(active_norm)
-            if active_norm.item() > 0.05:
-                cfg['TRAIN']['LR'] *= 0.5
-            if active_norm.item() > 0.1:
-                cfg['TRAIN']['LR'] *= 0.5
+            if active_norm.item() > 0.05 and flag1:
+                cfg['TRAIN']['LR'] *= 0.1
+                flag1 = False
+            if active_norm.item() > 0.1 and flag2:
+                cfg['TRAIN']['LR'] *= 0.1
+                flag2 = False
             correct = 0
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:

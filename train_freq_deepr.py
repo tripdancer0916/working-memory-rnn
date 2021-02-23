@@ -175,7 +175,8 @@ def main(config_path):
             # print(model.tensor_is_con_0[:10, :10])
             for j, param in enumerate(model.parameters()):
                 param.data -= cfg['TRAIN']['LR'] * param.grad.data
-            model.abs_w_0.data = model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data
+            model.abs_w_0.data = model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data + \
+                torch.randn_like(model.abs_w_0).to(device) * 0.005
             # model.abs_w_0.data = torch.zeros((256, 256))
             # print(model.abs_w_0.data == model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data)
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),
@@ -183,19 +184,21 @@ def main(config_path):
             num_data += target.cpu().detach().numpy().shape[0]
             num_reconnect = num_connection - np.count_nonzero(model.theta.detach().cpu().numpy() > 0)
             # print(np.count_nonzero(model.theta.detach().cpu().numpy() > 0))
+            print(num_reconnect)
             if num_reconnect > 0:
-                # zero_index = model.theta.detach().cpu().numpy() <= 0
+                below_zero_index = model.theta.detach().cpu().numpy() < 0
                 nonzero_index = model.theta.detach().cpu().numpy() > 0
-                # print(zero_index[:10, :10])
+                # print(nonzero_index[:10, :10])
                 # print(model.tensor_is_con_0[:10, :10])
+                # model.abs_w_0.data[below_zero_index] = 0
                 model.tensor_is_con_0 *= torch.from_numpy(nonzero_index.astype(np.int)).float()
                 # print(np.count_nonzero(zero_index))
-                print(np.count_nonzero(model.tensor_is_con_0.detach().cpu().numpy()))
+                # print(np.count_nonzero(model.tensor_is_con_0.detach().cpu().numpy()))
                 candidate_connection = list(zip(*np.where(model.theta.detach().cpu().numpy() <= 0)))
                 np.random.shuffle(candidate_connection)
                 for j in range(num_reconnect):
                     model.tensor_is_con_0[candidate_connection[j]] = 1
-                    # model.abs_w_0.data[candidate_connection[j]] = 0.00001
+                    model.abs_w_0.data[candidate_connection[j]] = 0.00001
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             acc = correct / num_data

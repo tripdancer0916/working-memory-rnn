@@ -210,6 +210,7 @@ def main(config_path):
             print(active_norm)
             if active_norm.item() > 0.05 and flag1:
                 cfg['TRAIN']['LR'] *= 0.1
+                cfg['TRAIN']['ACTIVATION_LAMBDA'] *= 5
                 flag1 = False
             if active_norm.item() > 0.1 and flag2:
                 cfg['TRAIN']['LR'] *= 0.1

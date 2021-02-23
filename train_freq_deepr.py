@@ -207,9 +207,9 @@ def main(config_path):
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
             print(active_norm)
             if active_norm.item() > 0.05:
-                cfg['TRAIN']['LR'] *= 0.1
+                cfg['TRAIN']['LR'] *= 0.5
             if active_norm.item() > 0.1:
-                cfg['TRAIN']['LR'] *= 0.1
+                cfg['TRAIN']['LR'] *= 0.5
             correct = 0
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:

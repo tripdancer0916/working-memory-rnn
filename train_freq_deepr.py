@@ -198,7 +198,7 @@ def main(config_path):
                 np.random.shuffle(candidate_connection)
                 for j in range(num_reconnect):
                     model.tensor_is_con_0[candidate_connection[j]] = 1
-                    model.abs_w_0.data[candidate_connection[j]] = 0
+                    model.abs_w_0.data[candidate_connection[j]] = 0.00001
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             print(model.w_hh.data[:10, :10])

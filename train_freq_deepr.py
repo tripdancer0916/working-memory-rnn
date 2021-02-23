@@ -176,7 +176,7 @@ def main(config_path):
             for j, param in enumerate(model.parameters()):
                 param.data -= cfg['TRAIN']['LR'] * param.grad.data
             model.abs_w_0.data = model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data + \
-                torch.randn_like(model.abs_w_0).to(device) * 0.005
+                torch.randn_like(model.abs_w_0) * 0.005
             # model.abs_w_0.data = torch.zeros((256, 256))
             # print(model.abs_w_0.data == model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data)
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),

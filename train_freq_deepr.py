@@ -9,7 +9,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn.parameter import Parameter
 import yaml
 
 sys.path.append('../')
@@ -31,10 +30,10 @@ class RecurrentNeuralNetwork(nn.Module):
         self.w_0 = np.random.randn(n_hid, n_hid) / np.sqrt(n_hid)  # initial weight values
         self.abs_w_0 = torch.from_numpy(np.abs(self.w_0)).float()
         self.abs_w_0.requires_grad = True
-        is_con_0 = np.zeros((n_hid, n_hid), dtype=bool)
+        is_con_0 = np.zeros((n_hid, n_hid))
         ind_in = np.random.choice(np.arange(n_hid), size=6553)
         ind_out = np.random.choice(np.arange(n_hid), size=6553)
-        is_con_0[ind_in, ind_out] = True
+        is_con_0[ind_in, ind_out] = 1
 
         # Generate random signs
         sign_0 = np.sign(np.random.randn(n_hid, n_hid))
@@ -195,7 +194,7 @@ def main(config_path):
                 candidate_connection = list(zip(*np.where(model.theta.detach().cpu().numpy() <= 0)))
                 np.random.shuffle(candidate_connection)
                 for j in range(num_reconnect):
-                    model.tensor_is_con_0[candidate_connection[j]] = True
+                    model.tensor_is_con_0[candidate_connection[j]] = 1
                     model.abs_w_0.data[candidate_connection[j]] = 0.00001
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:

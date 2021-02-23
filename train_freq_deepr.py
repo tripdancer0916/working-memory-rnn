@@ -184,9 +184,10 @@ def main(config_path):
             num_data += target.cpu().detach().numpy().shape[0]
             num_reconnect = num_connection - np.count_nonzero(model.theta.detach().cpu().numpy() > 0)
             # print(np.count_nonzero(model.theta.detach().cpu().numpy() > 0))
-            print(num_reconnect)
+            # print(num_reconnect)
+            print(model.w_hh.data[:10, :10])
             if num_reconnect > 0:
-                below_zero_index = model.theta.detach().cpu().numpy() < 0
+                # below_zero_index = model.theta.detach().cpu().numpy() < 0
                 nonzero_index = model.theta.detach().cpu().numpy() > 0
                 # print(nonzero_index[:10, :10])
                 # print(model.tensor_is_con_0[:10, :10])

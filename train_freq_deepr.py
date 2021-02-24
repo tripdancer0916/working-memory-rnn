@@ -140,7 +140,7 @@ def main(config_path):
     )
 
     print(model)
-    print(model.state_dict())
+    # print(model.state_dict())
     print('Epoch Loss Acc')
 
     correct = 0
@@ -221,6 +221,9 @@ def main(config_path):
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
             torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
+            np.save(f'w_sign_{epoch}.npy', model.w_sign.detach().cpu().numpy())
+            np.save(f'tensor_is_con_{epoch}.npy', model.tensor_is_con_0.detach().cpu().numpy())
+            np.save(f'abs_w_0_{epoch}.npy', model.abs_w_0.detach().cpu().numpy())
 
 
 if __name__ == '__main__':

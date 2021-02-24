@@ -140,6 +140,7 @@ def main(config_path):
     )
 
     print(model)
+    print(model.state_dict())
     print('Epoch Loss Acc')
 
     correct = 0

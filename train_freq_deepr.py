@@ -146,6 +146,7 @@ def main(config_path):
     correct = 0
     num_data = 0
     num_connection = 13000
+    b = 1
     flag1 = True
     flag2 = True
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
@@ -179,7 +180,7 @@ def main(config_path):
             for j, param in enumerate(model.parameters()):
                 param.data -= cfg['TRAIN']['LR'] * param.grad.data
             model.abs_w_0.data = model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data + \
-                torch.randn_like(model.abs_w_0) * (cfg['TRAIN']['LR'] * 0.1) - \
+                torch.randn_like(model.abs_w_0) * (cfg['TRAIN']['LR'] * 0.1 * b) - \
                 cfg['TRAIN']['LR'] * model.abs_w_0.data * (cfg['TRAIN']['LR'] * 5)
             # model.abs_w_0.data = torch.zeros((256, 256))
             # print(model.abs_w_0.data == model.abs_w_0.data - cfg['TRAIN']['LR'] * model.abs_w_0.grad.data)
@@ -216,14 +217,15 @@ def main(config_path):
             if active_norm.item() > 0.1 and flag2:
                 cfg['TRAIN']['LR'] *= 0.1
                 cfg['TRAIN']['ACTIVATION_LAMBDA'] *= 5
+                b = 0
                 flag2 = False
             correct = 0
             num_data = 0
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
             torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
-            np.save(f'w_sign_{epoch}.npy', model.w_sign.detach().cpu().numpy())
-            np.save(f'tensor_is_con_{epoch}.npy', model.tensor_is_con_0.detach().cpu().numpy())
-            np.save(f'abs_w_0_{epoch}.npy', model.abs_w_0.detach().cpu().numpy())
+            np.save(os.path.join(save_path, f'w_sign_{epoch}.npy'), model.w_sign.detach().cpu().numpy())
+            np.save(os.path.join(save_path, f'tensor_is_con_{epoch}.npy'), model.tensor_is_con_0.detach().cpu().numpy())
+            np.save(os.path.join(save_path, f'abs_w_0_{epoch}.npy'), model.abs_w_0.detach().cpu().numpy())
 
 
 if __name__ == '__main__':

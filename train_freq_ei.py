@@ -28,8 +28,10 @@ class RecurrentNeuralNetwork(nn.Module):
         self.n_hid = n_hid
         self.n_out = n_out
         self.w_in = nn.Linear(n_in, n_hid, bias=False)
+
         self.w_hh = nn.Linear(n_hid, n_hid, bias=False)
         self.w_hh.weight.data = torch.rand(n_hid, n_hid) / n_hid
+        # self.w_hh.requires_grad = True
         self.e_i_neuron = torch.eye(n_hid) * torch.from_numpy(np.array([1 if i < 180 else -1 for i in range(256)])).float()
         self.e_i_neuron = self.e_i_neuron.to(device)
 
@@ -46,7 +48,7 @@ class RecurrentNeuralNetwork(nn.Module):
         return torch.randn_like(hidden).to(self.device) * self.sigma_neu * torch.sqrt(alpha)
 
     def forward(self, input_signal, hidden):
-        w_rec = torch.mm(self.w_hh.weight.data, self.e_i_neuron)
+        w_rec = torch.mm(self.w_hh.weight, self.e_i_neuron)
         num_batch = input_signal.size(0)
         length = input_signal.size(1)
         hidden_list = torch.zeros(length, num_batch, self.n_hid).type_as(input_signal.data)
@@ -56,8 +58,9 @@ class RecurrentNeuralNetwork(nn.Module):
 
         for t in range(length):
             activated = torch.tanh(hidden)
-
+            # tmp_hidden = self.w_in(input_signal[t]) + self.w_hh(activated)
             tmp_hidden = self.w_in(input_signal[t]) + F.linear(activated, w_rec)
+            # tmp_hidden = self.w_in(input_signal[t]) + F.linear(activated, self.w_hh)
             neural_noise = self.make_neural_noise(hidden, self.alpha)
             hidden = (1 - self.alpha) * hidden + self.alpha * tmp_hidden + neural_noise
 
@@ -125,10 +128,12 @@ def main(config_path):
     print(model)
     print(model.state_dict())
     print('Epoch Loss Acc')
-    optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters()),
-                          lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()),
+                           lr=cfg['TRAIN']['LR'], weight_decay=cfg['TRAIN']['WEIGHT_DECAY'])
     correct = 0
     num_data = 0
+    flag1 = True
+    flag2 = True
     for epoch in range(cfg['TRAIN']['NUM_EPOCH'] + 1):
         model.train()
         for i, data in enumerate(train_dataloader):
@@ -139,7 +144,7 @@ def main(config_path):
 
             hidden = torch.zeros(cfg['TRAIN']['BATCHSIZE'], cfg['MODEL']['SIZE'])
             hidden = hidden.to(device)
-
+            optimizer.zero_grad()
             hidden = hidden.detach()
             hidden_list, output, hidden = model(inputs, hidden)
 
@@ -155,6 +160,13 @@ def main(config_path):
             loss.backward()
 
             optimizer.step()
+            """
+            for j, param in enumerate(model.parameters()):
+                print(param)
+                param.data -= cfg['TRAIN']['LR'] * param.grad.data
+            model.w_hh.data = model.w_hh.data - cfg['TRAIN']['LR'] * model.w_hh.grad.data - \
+                cfg['TRAIN']['LR'] * model.w_hh.data * (cfg['TRAIN']['LR'] * 5)
+            """
             correct += (np.argmax(output[:, -1].cpu().detach().numpy(),
                                   axis=1) == target.cpu().detach().numpy()).sum().item()
             num_data += target.cpu().detach().numpy().shape[0]
@@ -162,14 +174,24 @@ def main(config_path):
             model.w_hh.weight.data *= torch.from_numpy(plus_index.astype(np.int)).float().to(device)
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
-            # print(model.w_hh.data[:10, :10])
+            print(model.w_hh.weight.data[:10, :10])
             acc = correct / num_data
             print(f'{epoch}, {loss.item():.6f}, {acc:.6f}')
             print(active_norm)
+            # if active_norm.item() > 0.05 and flag1:
+            #     cfg['TRAIN']['LR'] *= 0.1
+            #     cfg['TRAIN']['ACTIVATION_LAMBDA'] *= 5
+            #     flag1 = False
+            # if active_norm.item() > 0.1 and flag2:
+            #     cfg['TRAIN']['LR'] *= 0.1
+            #     cfg['TRAIN']['ACTIVATION_LAMBDA'] *= 5
+            #     flag2 = False
+            correct = 0
+            num_data = 0
 
         if epoch > 0 and epoch % cfg['TRAIN']['NUM_SAVE_EPOCH'] == 0:
             torch.save(model.state_dict(), os.path.join(save_path, f'epoch_{epoch}.pth'))
-            # np.save(os.path.join(save_path, f'w_sign_{epoch}.npy'), model.w_sign.detach().cpu().numpy())
+            # np.save(os.path.join(save_path, f'w_hh_{epoch}.npy'), model.w_hh.detach().cpu().numpy())
             # np.save(os.path.join(save_path, f'tensor_is_con_{epoch}.npy'), model.tensor_is_con_0.detach().cpu().numpy())
             # np.save(os.path.join(save_path, f'abs_w_0_{epoch}.npy'), model.abs_w_0.detach().cpu().numpy())
 

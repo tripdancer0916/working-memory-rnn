@@ -30,7 +30,7 @@ class RecurrentNeuralNetwork(nn.Module):
         self.w_in = nn.Linear(n_in, n_hid, bias=False)
         self.w_hh = nn.Linear(n_hid, n_hid, bias=False)
         self.w_hh.weight.data = torch.rand(n_hid, n_hid) / n_hid
-        self.e_i_neuron = torch.eye(n_hid) * torch.from_numpy(np.array([1 if i < 180 else -1 for i in range(256)]))
+        self.e_i_neuron = torch.eye(n_hid) * torch.from_numpy(np.array([1 if i < 180 else -1 for i in range(256)])).float()
 
         self.w_out = nn.Linear(n_hid, n_out, bias=False)
 

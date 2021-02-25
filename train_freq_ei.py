@@ -159,7 +159,7 @@ def main(config_path):
                                   axis=1) == target.cpu().detach().numpy()).sum().item()
             num_data += target.cpu().detach().numpy().shape[0]
             plus_index = model.w_hh.weight.detach().cpu().numpy() > 0
-            model.w_hh.weight.data *= torch.from_numpy(plus_index.astype(np.int)).float()
+            model.w_hh.weight.data *= torch.from_numpy(plus_index.astype(np.int)).float().to(device)
 
         if epoch % cfg['TRAIN']['DISPLAY_EPOCH'] == 0:
             # print(model.w_hh.data[:10, :10])
